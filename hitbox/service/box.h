@@ -1,0 +1,69 @@
+﻿#ifndef HITBOXES_H
+#define HITBOXES_H
+
+#include "view/control.h"
+#include "service/runable.h"
+#include "context/description.h"
+
+struct BoxToDraw {
+	ImVec2 min;
+	ImVec2 max;
+	ImColor color;
+	float alpha;
+	float thickness;
+};
+
+struct LineToDraw {
+	ImVec2 start;
+	ImVec2 end;
+	ImColor color;
+	float alpha;
+	float thickness;
+};
+
+namespace hitboxes {
+	class box {
+	public:
+		float thickness;
+		float alpha;
+		static std::vector<BoxToDraw> boxesToDraw;
+		static void DrawBoxes();
+	public:
+		bool foreground(range& r, ImColor color);
+
+		virtual bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) = 0;
+		virtual bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc, bool passineffect) = 0;
+	};
+
+	class attack :public box {
+	public:
+		bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
+		bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
+	};
+
+	class body : public box {
+	public:
+		bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
+		bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
+	};
+
+	class hit : public box {
+	public:
+		bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
+		bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
+	};
+
+	class line {
+	public:
+		float thickness;
+		float alpha;
+		static std::vector<LineToDraw> linesToDraw;
+		static void DrawLines();
+		bool resolve(object* obj, descript desc, size_t index);
+	private:
+		bool foreground(float x, ImColor color);
+		bool GetEnemyBodyWidth(object* obj, float& outX);
+	};
+};
+
+#endif

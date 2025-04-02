@@ -1,0 +1,78 @@
+﻿#include <cstdint>
+#include <windows.h>
+#include <thread>
+#include "entry/entry.h"
+
+#ifdef _DEBUG
+#include "symbol/loader.h"
+#endif // _DEBUG
+
+#ifndef _WIN64
+#error errors requires x64 environment
+#endif
+
+PRUNTIME_FUNCTION rebuild_exception(
+	_In_ DWORD64 ControlPc,
+	_In_opt_ PVOID Context
+)
+{
+	auto header = reinterpret_cast<uint64_t>(Context);
+	auto dos_header = reinterpret_cast<IMAGE_DOS_HEADER*>(header);
+	auto nt_header = reinterpret_cast<IMAGE_NT_HEADERS*>(header + dos_header->e_lfanew);
+	auto dircetory = &nt_header->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
+	auto routine = reinterpret_cast<PRUNTIME_FUNCTION>(header + dircetory->VirtualAddress);
+
+	PRUNTIME_FUNCTION result = nullptr;
+	for (int i = 0; i < dircetory->Size / sizeof(RUNTIME_FUNCTION); i++) {
+		uint64_t start = (header + routine[i].BeginAddress);
+		uint64_t end = (header + routine[i].EndAddress);
+		if (ControlPc >= start && ControlPc <= end) {
+			result = &routine[i];
+			break;
+		}
+	}
+	return result;
+}
+
+BOOL APIENTRY DllMain(HMODULE hModule,
+	DWORD  ul_reason_for_call,
+	LPVOID lpReserved
+)
+{
+	switch (ul_reason_for_call) {
+#ifndef _DEBUG
+	case DLL_PROCESS_DETACH:
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+		return TRUE;
+#else
+	case DLL_THREAD_ATTACH:
+	{
+		SymbolLoader loader;
+		loader.LoadSymbols(hModule);
+		return TRUE;
+	}
+	case DLL_PROCESS_DETACH:
+	{
+		SymCleanup(GetCurrentProcess());
+		return TRUE;
+	}
+	case DLL_THREAD_DETACH:
+		return TRUE;
+#endif // !_DEBUG
+	}
+
+	try {
+		std::thread(entry, hModule).detach();
+	}
+	catch (std::exception& e) {
+		MessageBoxA(NULL, e.what(), "warning", MB_OK);
+		TerminateProcess(GetCurrentProcess(), 0);
+	}
+
+	auto header = reinterpret_cast<uint64_t>(hModule);
+	auto dos_header = reinterpret_cast<IMAGE_DOS_HEADER*>(header);
+	auto nt_header = reinterpret_cast<IMAGE_NT_HEADERS*>(header + dos_header->e_lfanew);
+	RtlInstallFunctionTableCallback(header | 3, header, nt_header->OptionalHeader.SizeOfImage, rebuild_exception, hModule, NULL);
+	return TRUE;
+}
