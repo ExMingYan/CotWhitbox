@@ -35,7 +35,7 @@
 
 ## 感谢
 
-- 感谢[Redundantcy的个人空间-Redundantcy个人主页-哔哩哔哩视频 (bilibili.com)](https://space.bilibili.com/107436250)提供程序支持
+- 感谢[Redundantcy](https://space.bilibili.com/107436250)提供程序支持
 - [ImGui](https://github.com/ocornut/imgui)
 - [MinHook](https://github.com/TsudaKageyu/minhook)
 - [asmjit](https://github.com/asmjit/asmjit)

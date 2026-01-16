@@ -132,6 +132,7 @@
   address: integer | context:ContextAccess
   value: integer | number
 - return
+
   Success: boolean
 
 #### readBytes
