@@ -119,6 +119,34 @@ bool isAddressAccessAble(intptr_t address)
 	return true;
 }
 
+DWORD GetAddressProtect(intptr_t address)
+{
+	if ((void*)address == nullptr)
+		return 0;
+	MEMORY_BASIC_INFORMATION mbi;
+	SIZE_T result = VirtualQuery((LPCVOID)address, &mbi, sizeof(mbi));
+	if (result == 0)
+	{
+		return 0;
+	}
+	else if (!(mbi.State & MEM_COMMIT))
+	{
+		return 0;
+	}
+	return mbi.Protect;
+}
+
+bool isAddressExecutable(intptr_t address)
+{
+	DWORD protect = GetAddressProtect(address);
+	if (protect == 0)
+	{
+		return false;
+	}
+	const DWORD executeMask = PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
+	return (protect & executeMask) != 0;
+}
+
 BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam)
 {
 	HandleData& data = *(HandleData*)lParam;

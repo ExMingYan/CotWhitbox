@@ -53,16 +53,10 @@ void InitMemoryAccess(lua_State* L)
 
 	lua_pushcfunction(L, AddressEq);
 	lua_setfield(L, -2, "__eq");
-	lua_pushcfunction(L, AddressNe);
-	lua_setfield(L, -2, "__ne");
 	lua_pushcfunction(L, AddressLt);
 	lua_setfield(L, -2, "__lt");
 	lua_pushcfunction(L, AddressLe);
 	lua_setfield(L, -2, "__le");
-	lua_pushcfunction(L, AddressGt);
-	lua_setfield(L, -2, "__gt");
-	lua_pushcfunction(L, AddressGe);
-	lua_setfield(L, -2, "__ge");
 
 	lua_pushcfunction(L, AddressToString);
 	lua_setfield(L, -2, "__tostring");
@@ -159,13 +153,12 @@ static int Lua_GetProtect(lua_State* L)
 	intptr_t addr = GetAddressFromStack(L, 1);
 	if (isAddressAccessAble(addr))
 	{
-		MEMORY_BASIC_INFORMATION mbi;
-		SIZE_T result = VirtualQuery((LPCVOID)addr, &mbi, sizeof(mbi));
-		if (result != 0)
+		DWORD protect = GetAddressProtect(addr);
+		if (protect != 0)
 		{
 			for (const auto& pair : MemoryAttributes)
 			{
-				if (pair.second == mbi.Protect)
+				if (pair.second == protect)
 				{
 					lua_pushstring(L, pair.first);
 					return 1;
@@ -592,14 +585,6 @@ static int AddressEq(lua_State* L)
 	return 1;
 }
 
-static int AddressNe(lua_State* L)
-{
-	intptr_t val1 = GetAddressFromStack(L, 1);
-	intptr_t val2 = GetAddressFromStack(L, 2);
-	lua_pushboolean(L, val1 != val2);
-	return 1;
-}
-
 static int AddressLt(lua_State* L)
 {
 	intptr_t val1 = GetAddressFromStack(L, 1);
@@ -613,22 +598,6 @@ static int AddressLe(lua_State* L)
 	intptr_t val1 = GetAddressFromStack(L, 1);
 	intptr_t val2 = GetAddressFromStack(L, 2);
 	lua_pushboolean(L, val1 <= val2);
-	return 1;
-}
-
-static int AddressGt(lua_State* L)
-{
-	intptr_t val1 = GetAddressFromStack(L, 1);
-	intptr_t val2 = GetAddressFromStack(L, 2);
-	lua_pushboolean(L, val1 > val2);
-	return 1;
-}
-
-static int AddressGe(lua_State* L)
-{
-	intptr_t val1 = GetAddressFromStack(L, 1);
-	intptr_t val2 = GetAddressFromStack(L, 2);
-	lua_pushboolean(L, val1 >= val2);
 	return 1;
 }
 

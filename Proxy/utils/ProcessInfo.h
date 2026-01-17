@@ -30,3 +30,5 @@ bool WindowLoaded(std::string WindowClass);
 bool CheckGameVersion(const std::wstring versionSymbol);
 bool GetModuleBaseAddressAndSize(const std::wstring& moduleName, uintptr_t& baseAddress, size_t& moduleSize);
 bool isAddressAccessAble(intptr_t address);
+DWORD GetAddressProtect(intptr_t address);
+bool isAddressExecutable(intptr_t address);
