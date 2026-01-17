@@ -18,11 +18,11 @@ namespace hitboxes {
 	{
 		runable* invoke = runable::instance();
 
-		FVector w1{ r.left, 0.0f, r.top };
+		FVector w1{ r.left, r.depth, r.top };
 		FVector2D s1{};
 		invoke->screen(w1, s1);
 
-		FVector w3{ r.right, 0.0f, r.bottom };
+		FVector w3{ r.right, r.depth, r.bottom };
 		FVector2D s3{};
 		invoke->screen(w3, s3);
 
@@ -212,14 +212,14 @@ namespace hitboxes {
 		return false;
 	}
 
-	bool line::foreground(float x, ImColor color)
+	bool line::foreground(float x, float depth, ImColor color)
 	{
 		runable* invoke = runable::instance();
-		FVector w1{ x * 10, 0.0f, 240.0f };
+		FVector w1{ x * 10, depth, 240.0f };
 		FVector2D s1;
 		invoke->screen(w1, s1);
 
-		FVector w2{ x * 10 };
+		FVector w2{ x * 10, depth };
 		FVector2D s2;
 		invoke->screen(w2, s2);
 
@@ -249,7 +249,7 @@ namespace hitboxes {
 			x += obj->left() ? obj->cbas->DDistance : -(obj->cbas->DDistance);
 			break;
 		}
-		foreground(x, desc.color);
+		foreground(x, 0.0f, desc.color);
 		return true;
 	}
 };

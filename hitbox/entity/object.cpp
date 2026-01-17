@@ -43,6 +43,7 @@ range::range(object* obj, HitRect rect)
 	}
 	top = (obj->y + rect.y + obj->yoff) * 10;
 	bottom = top - rect.h * 10;
+	depth = 0.0f;
 }
 
 range::range(projectile* obj, HitRect rect)
@@ -57,4 +58,5 @@ range::range(projectile* obj, HitRect rect)
 	}
 	top = (obj->y + rect.y + obj->yoff) * 10;
 	bottom = top - rect.h * 10;
+	depth = 0.0f;
 }

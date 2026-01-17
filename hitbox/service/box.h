@@ -61,7 +61,7 @@ namespace hitboxes {
 		static void DrawLines();
 		bool resolve(object* obj, descript desc, size_t index);
 	private:
-		bool foreground(float x, ImColor color);
+		bool foreground(float x, float depth, ImColor color);
 		bool GetEnemyBodyWidth(object* obj, float& outX);
 	};
 };

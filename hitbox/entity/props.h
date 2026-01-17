@@ -68,6 +68,7 @@ struct range {
 	float top;
 	float right;
 	float bottom;
+	float depth;
 
 	range(object* obj, HitRect rect);
 	range(projectile* obj, HitRect rect);
