@@ -4,9 +4,25 @@
 #include <Lua/lua.hpp>
 #include "utils/ProcessInfo.h"
 #include <cstdint>
+#include <string>
 #include <type_traits>
+#include <unordered_map>
 #include <windows.h>
+#include <array>
 
+constexpr std::array<std::pair<const char*, DWORD>, 5> MemoryAttributes =
+{{
+	{"R", PAGE_READONLY},
+	{"W", PAGE_READWRITE},
+	{"X", PAGE_EXECUTE},
+	{"RX", PAGE_EXECUTE_READ},
+	{"RWX", PAGE_EXECUTE_READWRITE}
+}};
+
+static int Lua_Alloc(lua_State* L);
+static int Lua_GetProtect(lua_State* L);
+static int Lua_SetProtect(lua_State* L);
+static int Lua_Free(lua_State* L);
 static int ReadFloat(lua_State* L);
 static int ReadDouble(lua_State* L);
 static int ReadPointer(lua_State* L);

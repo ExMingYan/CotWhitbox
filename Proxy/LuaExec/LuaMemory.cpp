@@ -4,6 +4,10 @@
 
 void InitMemoryAccess(lua_State* L)
 {
+	lua_register(L, "AllocMemory", Lua_Alloc);
+	lua_register(L, "GetMemoryProtect", Lua_GetProtect);
+	lua_register(L, "SetMemoryProtect", Lua_SetProtect);
+	lua_register(L, "FreeMemory", Lua_Free);
 	lua_register(L, "readInt8", ReadIntegerValue<int8_t>);
 	lua_register(L, "readUInt8", ReadIntegerValue<uint8_t>);
 	lua_register(L, "readByte", ReadIntegerValue<uint8_t>);
@@ -119,6 +123,97 @@ void InitMemoryAccess(lua_State* L)
 	luaL_getmetatable(L, "ContextAccess");
 	lua_setmetatable(L, -2);
 	lua_setglobal(L, "context");
+}
+
+static int Lua_Alloc(lua_State* L)
+{
+	int64_t size = luaL_checkinteger(L, 1);
+	if (size <= 0)
+	{
+		lua_pushnil(L);
+		return 1;
+	}
+	const char* attribute = luaL_checkstring(L, 2);
+	std::string attrStr(attribute ? attribute : "RWX");
+	DWORD protect = PAGE_EXECUTE_READWRITE;
+	for (const auto& pair : MemoryAttributes)
+	{
+		if (attrStr == pair.first)
+		{
+			protect = pair.second;
+			break;
+		}
+	}
+	LPVOID addr = VirtualAlloc(NULL, (SIZE_T)size, MEM_COMMIT | MEM_RESERVE, protect);
+	if (addr)
+	{
+		PushAddressObject(L, (intptr_t)addr);
+		return 1;
+	}
+	lua_pushnil(L);
+	return 1;
+}
+
+static int Lua_GetProtect(lua_State* L)
+{
+	intptr_t addr = GetAddressFromStack(L, 1);
+	if (isAddressAccessAble(addr))
+	{
+		MEMORY_BASIC_INFORMATION mbi;
+		SIZE_T result = VirtualQuery((LPCVOID)addr, &mbi, sizeof(mbi));
+		if (result != 0)
+		{
+			for (const auto& pair : MemoryAttributes)
+			{
+				if (pair.second == mbi.Protect)
+				{
+					lua_pushstring(L, pair.first);
+					return 1;
+				}
+			}
+		}
+	}
+	lua_pushnil(L);
+	return 1;
+}
+
+static int Lua_SetProtect(lua_State* L)
+{
+	intptr_t addr = GetAddressFromStack(L, 1);
+	size_t size = (size_t)luaL_checkinteger(L, 2);
+	const char* attribute = luaL_checkstring(L, 3);
+	std::string attrStr(attribute ? attribute : "RWX");
+	if (isAddressAccessAble(addr) && size > 0)
+	{
+		DWORD protect = PAGE_EXECUTE_READWRITE;
+		for (const auto& pair : MemoryAttributes)
+		{
+			if (attrStr == pair.first)
+			{
+				protect = pair.second;
+				break;
+			}
+		}
+		DWORD oldProtect;
+		BOOL result = VirtualProtect((LPVOID)addr, (SIZE_T)size, protect, &oldProtect);
+		lua_pushboolean(L, result != 0);
+		return 1;
+	}
+	lua_pushboolean(L, false);
+	return 1;
+}
+
+static int Lua_Free(lua_State* L)
+{
+	intptr_t addr = GetAddressFromStack(L, 1);
+	if (isAddressAccessAble(addr))
+	{
+		BOOL result = VirtualFree((LPVOID)addr, 0, MEM_RELEASE);
+		lua_pushboolean(L, result != 0);
+		return 1;
+	}
+	lua_pushboolean(L, false);
+	return 1;
 }
 
 static int ReadFloat(lua_State* L)
