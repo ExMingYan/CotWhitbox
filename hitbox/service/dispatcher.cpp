@@ -13,9 +13,9 @@ namespace hitboxes {
 		if (!mapping->checks())
 			return false;
 
-		auto objs = *mapping->objs;
-		auto p1 = objs->p1;
-		auto p2 = objs->p2;
+		auto Instance = *mapping->Instance;
+		auto p1 = Instance->p1;
+		auto p2 = Instance->p2;
 
 		for (description& desc : descriptions) {
 			if (!desc.activity)
@@ -57,7 +57,7 @@ namespace hitboxes {
 				}
 			}
 
-			auto list = objs->subobjects->props_list;
+			auto list = Instance->subobjects->props_list;
 			for (; list != nullptr; list = list->next) {
 				projectile* props = list->props;
 				if (props->isInvalidate())

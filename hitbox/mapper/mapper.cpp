@@ -8,33 +8,42 @@ bool mapper::initliaze()
 		return false;
 	}
 
-	this->objs = reinterpret_cast<objects**>(searcher::transform(searcher::search(".text", signatures::objects)));
-	if (this->objs == nullptr) {
+	this->Instance = reinterpret_cast<GameInstance**>(searcher::transform(searcher::search(".text", signatures::objects)));
+	if (this->Instance == nullptr) {
 		return false;
 	}
 
-	this->WorldToScreen = reinterpret_cast<bool(*)(void* Player, const FVector & WorldPosition, FVector2D & ScreenPosition, bool bPlayerViewportRelative)>(searcher::search(".text", signatures::screen));
+	this->WorldToScreen = reinterpret_cast<WorldToScreenFunc>(searcher::search(".text", signatures::screen));
 	if (this->WorldToScreen == nullptr) {
 		return false;
 	}
+
+	this->isBattleReady = reinterpret_cast<IsBattleReady>(searcher::transform(searcher::search(".text", signatures::IsBattleReadyPattern) - 2));
+	if (this->isBattleReady == nullptr) {
+		return false;
+	}
+
+	this->isBattleEnd = reinterpret_cast<IsBattleEnd>(searcher::transform(searcher::search(".text", signatures::IsBattleEndPattern) - 2));
+	if (this->isBattleEnd == nullptr) {
+		return false;
+	}
+
 	return true;
 }
 
 bool mapper::checks() {
-	auto objs = *this->objs;
-	if (objs == nullptr)
+	auto Instance = *this->Instance;
+	if (Instance == nullptr)
 		return false;
 
-	if (objs->p1 == nullptr || objs->p2 == nullptr)
+	if (Instance->p1 == nullptr || Instance->p2 == nullptr)
 		return false;
 
-	auto ready = objs->ready;
-	if (ready <= 2)
+	if (!isBattleReady(Instance))
 		return false;
 
-	auto blackout = objs->blackout;
-	if (blackout != 0)
+	if (isBattleEnd(Instance))
 		return false;
 
-	return !objs->isBattleEnd;
+	return true;
 }

@@ -235,7 +235,7 @@ bool entry(HMODULE hmodule)
 	return true;
 }
 
-void* FontAtlasUpload(ImGuiIO& io)
+void FontAtlasUpload(ImGuiIO& io)
 {
 	unsigned char* pixels = nullptr;
 	int tex_width = 0, tex_height = 0, bytes_per_pixel = 0;
@@ -305,7 +305,7 @@ void* FontAtlasUpload(ImGuiIO& io)
 					const BYTE* src = (const BYTE*)pixels;
 					const UINT srcRowPitch = tex_width * bytes_per_pixel;
 					const UINT dstRowPitch = (UINT)footprint.Footprint.RowPitch;
-					for (UINT y = 0; y < tex_height; y++)
+					for (UINT y = 0; y < (UINT)tex_height; y++)
 					{
 						memcpy(dst + (size_t)y * dstRowPitch, src + (size_t)y * srcRowPitch, srcRowPitch);
 					}
@@ -390,4 +390,5 @@ void* FontAtlasUpload(ImGuiIO& io)
 			}
 		}
 	}
+	return;
 }

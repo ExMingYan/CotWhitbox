@@ -79,22 +79,13 @@ struct subobject
 };
 
 #define SUBOBJOFFSET 0x75C48
-#define BLACKOUTOFFSET 0x75FD0
-#define READYOFFSET 0x85448
 
 _declspec(align(8))
-struct objects
+struct GameInstance
 {
 	void* padding0[0x3];								//0x0
 	object* p1;											//0x18
 	object* p2;											//0x20
 	uint8_t padding1[SUBOBJOFFSET - 0x28];				//0x28
 	subobject* subobjects;
-	uint8_t paddingblackout[BLACKOUTOFFSET - SUBOBJOFFSET - 0x8];
-	int32_t blackout;
-	uint8_t paddingready[READYOFFSET - BLACKOUTOFFSET - 0x4];
-	int32_t ready;
-	uint32_t paddingend[0x5];
-	bool isBattleEnd;
 };
-static_assert(offsetof(objects, ready) == READYOFFSET, "Wrong offset for objects::ready");
