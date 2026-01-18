@@ -125,7 +125,7 @@ namespace control {
 		ImVec2 pos = window->DC.CursorPos;
 		ImVec2 size = imgui::CalcItemSize(ImVec2(200, 50), label_size.x + style.FramePadding.x * 2.0f, label_size.y + style.FramePadding.y * 2.0f);
 
-		const ImRect rect(pos, pos + size);
+		const ImRect rect(pos, { pos.x + size.x, pos.y + size.y });
 		imgui::ItemSize(size, style.FramePadding.y);
 		if (!imgui::ItemAdd(rect, id))
 			return false;
@@ -159,7 +159,7 @@ namespace control {
 		ImVec2 pos = window->DC.CursorPos;
 		ImVec2 size = imgui::CalcItemSize(ImVec2(100, 30), label_size.x + style.FramePadding.x * 2.0f, label_size.y + style.FramePadding.y * 2.0f);
 
-		const ImRect rect(pos, pos + size);
+		const ImRect rect(pos, { pos.x + size.x, pos.y + size.y });
 		imgui::ItemSize(size, style.FramePadding.y);
 		if (!imgui::ItemAdd(rect, id))
 			return false;

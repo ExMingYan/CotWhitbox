@@ -10,6 +10,8 @@
 
 #pragma comment(lib, "d3d12.lib")
 
+void* FontAtlasUpload(ImGuiIO& io);
+
 int countnum = -1;
 bool nopants_enabled = true;
 

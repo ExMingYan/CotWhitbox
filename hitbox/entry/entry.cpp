@@ -101,7 +101,9 @@ HRESULT hkPresent(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags) {
 			configurs::icon_awesmoe = io.Fonts->AddFontFromMemoryTTF(FontAewsome6, sizeof(FontAewsome6), icon_size, &icons_config, icons_ranges);
 			configurs::icon_brands = io.Fonts->AddFontFromMemoryTTF(FontAwesome6Brands, sizeof(FontAwesome6Brands), 30.0f, &icons_config, icons_ranges);
 
-			ImGuiStyle& style = imgui::GetStyle();
+			FontAtlasUpload(io);
+
+			ImGuiStyle& style = ImGui::GetStyle();
 			style.Colors[ImGuiCol_WindowBg] = ImColor(36, 40, 49, 255).Value;//背景色
 			style.FrameRounding = 4.0f;//圆角
 
@@ -112,7 +114,8 @@ HRESULT hkPresent(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags) {
 				DirectX12Interface::DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart(),
 				DirectX12Interface::DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart());
 			ImGui_ImplDX12_CreateDeviceObjects();
-			ImGui::GetIO().ImeWindowHandle = Process::Hwnd;
+			ImGui::GetMainViewport()->PlatformHandle = (void*)Process::Hwnd;
+			ImGui::GetMainViewport()->PlatformHandleRaw = (void*)Process::Hwnd;
 		}
 		else
 		{
@@ -230,4 +233,161 @@ bool entry(HMODULE hmodule)
 		}
 	}
 	return true;
+}
+
+void* FontAtlasUpload(ImGuiIO& io)
+{
+	unsigned char* pixels = nullptr;
+	int tex_width = 0, tex_height = 0, bytes_per_pixel = 0;
+	io.Fonts->GetTexDataAsRGBA32(&pixels, &tex_width, &tex_height, &bytes_per_pixel);
+
+	if (pixels && tex_width > 0 && tex_height > 0 && DirectX12Interface::Device)
+	{
+		ID3D12Device* device = DirectX12Interface::Device;
+		D3D12_RESOURCE_DESC texDesc = {};
+		texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		texDesc.Alignment = 0;
+		texDesc.Width = (UINT64)tex_width;
+		texDesc.Height = (UINT)tex_height;
+		texDesc.DepthOrArraySize = 1;
+		texDesc.MipLevels = 1;
+		texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		texDesc.SampleDesc.Count = 1;
+		texDesc.SampleDesc.Quality = 0;
+		texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+		texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		ID3D12Resource* fontTexture = nullptr;
+		D3D12_HEAP_PROPERTIES defaultHeapProps = {};
+		defaultHeapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+		defaultHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		defaultHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		defaultHeapProps.VisibleNodeMask = 1;
+		defaultHeapProps.CreationNodeMask = 1;
+
+		if (FAILED(device->CreateCommittedResource(
+			&defaultHeapProps,
+			D3D12_HEAP_FLAG_NONE,
+			&texDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			IID_PPV_ARGS(&fontTexture))))
+		{
+			fontTexture = nullptr;
+		}
+		else
+		{
+			UINT64 uploadBufferSize = 0;
+			D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
+			UINT numRows = 0;
+			UINT64 rowSizeInBytes = 0;
+			device->GetCopyableFootprints(&texDesc, 0, 1, 0, &footprint, &numRows, &rowSizeInBytes, &uploadBufferSize);
+
+			ID3D12Resource* uploadBuffer = nullptr;
+			D3D12_HEAP_PROPERTIES uploadHeapProps = {};
+			uploadHeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+			D3D12_RESOURCE_DESC bufDesc = {};
+			bufDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+			bufDesc.Width = uploadBufferSize;
+			bufDesc.Height = 1;
+			bufDesc.DepthOrArraySize = 1;
+			bufDesc.MipLevels = 1;
+			bufDesc.SampleDesc.Count = 1;
+			bufDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+			bufDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+			if (SUCCEEDED(device->CreateCommittedResource(&uploadHeapProps, D3D12_HEAP_FLAG_NONE, &bufDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadBuffer))))
+			{
+				void* mapped = nullptr;
+				D3D12_RANGE readRange = { 0, 0 };
+				if (SUCCEEDED(uploadBuffer->Map(0, &readRange, &mapped)))
+				{
+					BYTE* dst = (BYTE*)mapped + footprint.Offset;
+					const BYTE* src = (const BYTE*)pixels;
+					const UINT srcRowPitch = tex_width * bytes_per_pixel;
+					const UINT dstRowPitch = (UINT)footprint.Footprint.RowPitch;
+					for (UINT y = 0; y < tex_height; y++)
+					{
+						memcpy(dst + (size_t)y * dstRowPitch, src + (size_t)y * srcRowPitch, srcRowPitch);
+					}
+					uploadBuffer->Unmap(0, nullptr);
+				}
+
+				ID3D12CommandQueue* uploadQueue = nullptr;
+				ID3D12CommandAllocator* uploadAlloc = nullptr;
+				ID3D12GraphicsCommandList* uploadList = nullptr;
+				ID3D12Fence* fence = nullptr;
+				HANDLE fenceEvent = nullptr;
+				UINT64 fenceValue = 0;
+
+				D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+				queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+				queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+				if (SUCCEEDED(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&uploadQueue))) &&
+					SUCCEEDED(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&uploadAlloc))) &&
+					SUCCEEDED(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, uploadAlloc, nullptr, IID_PPV_ARGS(&uploadList))) &&
+					SUCCEEDED(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence))))
+				{
+					D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+					dstLocation.pResource = fontTexture;
+					dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+					dstLocation.SubresourceIndex = 0;
+
+					D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+					srcLocation.pResource = uploadBuffer;
+					srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+					srcLocation.PlacedFootprint = footprint;
+
+					uploadList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
+
+					D3D12_RESOURCE_BARRIER barrier = {};
+					barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+					barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+					barrier.Transition.pResource = fontTexture;
+					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+					barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+					barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+					uploadList->ResourceBarrier(1, &barrier);
+
+					uploadList->Close();
+					ID3D12CommandList* ppCommandLists[] = { uploadList };
+					uploadQueue->ExecuteCommandLists(1, ppCommandLists);
+
+					fenceValue = 1;
+					uploadQueue->Signal(fence, fenceValue);
+					fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+					if (fenceEvent)
+					{
+						if (fence->GetCompletedValue() < fenceValue)
+							fence->SetEventOnCompletion(fenceValue, fenceEvent);
+						WaitForSingleObject(fenceEvent, INFINITE);
+						CloseHandle(fenceEvent);
+						fenceEvent = nullptr;
+					}
+				}
+
+				D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = DirectX12Interface::DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = DirectX12Interface::DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+				UINT descriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+				D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+				srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+				srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+				srvDesc.Texture2D.MipLevels = 1;
+				device->CreateShaderResourceView(fontTexture, &srvDesc, cpuHandle);
+
+				io.Fonts->SetTexID((ImTextureID)gpuHandle.ptr);
+				if (uploadList) { uploadList->Release(); uploadList = nullptr; }
+				if (uploadAlloc) { uploadAlloc->Release(); uploadAlloc = nullptr; }
+				if (uploadQueue) { uploadQueue->Release(); uploadQueue = nullptr; }
+				if (fence) { fence->Release(); fence = nullptr; }
+				if (uploadBuffer) { uploadBuffer->Release(); uploadBuffer = nullptr; }
+			}
+			else
+			{
+				fontTexture->Release();
+				fontTexture = nullptr;
+			}
+		}
+	}
 }
