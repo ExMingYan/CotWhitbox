@@ -211,11 +211,18 @@ bool entry(HMODULE hmodule)
 
 	Process::Title = "FATAL FURY: City of the Wolves  ";
 	Process::ClassName = "UnrealWindow";
-	Process::Hwnd = FindWindowA(Process::ClassName, Process::Title);
-	Process::WndProc = (WNDPROC)SetWindowLongPtr(Process::Hwnd, GWLP_WNDPROC, (LONG_PTR)WndProc);
-	if (Process::WndProc == nullptr) {
-		return false;
-	}
+
+	do {
+		Process::Hwnd = FindWindowA(Process::ClassName, Process::Title);
+		if (Process::Hwnd) {
+			Process::WndProc = (WNDPROC)SetWindowLongPtr(Process::Hwnd, GWLP_WNDPROC, (LONG_PTR)WndProc);
+		}
+
+		if (Process::WndProc == nullptr) {
+			Sleep(10);
+		}
+	} while (Process::WndProc == nullptr);
+
 	Process::Module = hmodule;
 	Process::ID = GetCurrentProcessId();
 	Process::Handle = GetCurrentProcess();
