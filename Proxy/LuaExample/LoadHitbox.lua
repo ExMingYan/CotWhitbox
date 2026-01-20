@@ -2,7 +2,7 @@
 
 local function Loadhitbox()
     if CheckGameVersion("108052") then
-        LoadDLL("hitbox.dll", true, "UnrealWindow")
+        LoadDLL("hitbox.dll")
     end
 end
 
