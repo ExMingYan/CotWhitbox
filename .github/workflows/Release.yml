@@ -1,0 +1,59 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "hitboxv*"
+      - "Proxyv*"
+
+jobs:
+  buildhitbox:
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/hitboxv')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build Solution
+        run: |
+          msbuild hitbox.sln /p:Configuration=Release /p:Platform=x64 /verbosity:minimal
+      - name: Create ZIP archive
+        run: Compress-Archive -Path ./x64/Release/DLLInjector.exe, ./x64/Release/hitbox.dll, ./x64/Release/launcher.exe -DestinationPath hitbox.zip
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: hitbox.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  buildproxy:
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/Proxyv')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build Solution
+        run: |
+          msbuild hitbox.sln /p:Configuration=Release /p:Platform=x64 /verbosity:minimal
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: ./x64/Release/*Proxy.dll
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
