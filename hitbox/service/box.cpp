@@ -40,7 +40,7 @@ namespace hitboxes {
 				continue;
 
 			Attack box = action.attack;
-			attack_collections atccs = obj->atcs->atccs[box.DataID];
+			attack_collections atccs = obj->atks->atccs[box.DataID];
 			if (desc.types.attack != atccs.types)
 				continue;
 
@@ -51,11 +51,11 @@ namespace hitboxes {
 				else if (box.HitNotGuard && obj->AttackNotGuard == 0)
 					continue;
 
-				if (atccs.position == AttackPosition::IneffectiveBack && !obj->positive())
+				if (atccs.hitBackDir == HitBackDirID::IneffectiveBack && !obj->positive())
 					continue;
-				else if (atccs.position == AttackPosition::IneffectiveFront && obj->positive())
+				else if (atccs.hitBackDir == HitBackDirID::IneffectiveFront && obj->positive())
 					continue;
-				else if (atccs.position == AttackPosition::IneffectiveAll)
+				else if (atccs.hitBackDir == HitBackDirID::IneffectiveAll)
 					continue;
 
 				CategoryID enemyCategory = obj->enemycategory();
@@ -98,7 +98,7 @@ namespace hitboxes {
 
 			if (box.Type == CollisionTypes::normal)
 			{
-				if (entry.iCategoryID == CategoryID::OnAir && entry.iSubCategoryID == SubCategoryID::BeAttack && obj->onairhitframe == 0)
+				if (entry.CategoryID == CategoryID::OnAir && entry.SubCategoryID == SubCategoryID::BeAttack && obj->onairhitframe == 0)
 					continue;
 				if (obj->avoidhitframe)
 					continue;
@@ -123,16 +123,16 @@ namespace hitboxes {
 				continue;
 
 			Attack box = action.attack;
-			attack_collections atccs = obj->atcs->atccs[box.DataID];
+			attack_collections atccs = obj->atks->atccs[box.DataID];
 			if (desc.types.attack != atccs.types)
 				continue;
 
 			if (passineffect) {
-				if (atccs.position == AttackPosition::IneffectiveBack && !obj->positive())
+				if (atccs.hitBackDir == HitBackDirID::IneffectiveBack && !obj->positive())
 					continue;
-				else if (atccs.position == AttackPosition::IneffectiveFront && obj->positive())
+				else if (atccs.hitBackDir == HitBackDirID::IneffectiveFront && obj->positive())
 					continue;
-				else if (atccs.position == AttackPosition::IneffectiveAll)
+				else if (atccs.hitBackDir == HitBackDirID::IneffectiveAll)
 					continue;
 
 				CategoryID enemyCategory = obj->enemycategory();

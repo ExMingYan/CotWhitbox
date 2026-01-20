@@ -2,44 +2,47 @@
 #include "action.h"
 #include "object.h"
 
+#define RemainingAttacksOffset 0x520
+#define InvalidateOffset 0x52C
+
 _declspec(align(8))
 struct projectile
 {
-	int64_t padding0[0x7];
+	int64_t padding0[CalcFillSize(ACTIONSOFFSET, 0, sizeof(int64_t))];
 	actions* acts;
-	int64_t padding1[0x5];
-	attacks* atcs;
-	int64_t padding2[0x4];
+	int64_t padding1[CalcFillSize(ATTACKSOFFSET, ACTIONSOFFSET, sizeof(int64_t))];
+	attacks* atks;
+	int64_t padding2[CalcFillSize(ENEMYOFFSET, ATTACKSOFFSET, sizeof(int64_t))];
 	object* enemy;
 	object* owner;
 	float x;
 	float y;
 	float z;
-	int32_t _0xAC[0xC];
-	float xoff;					//0xDC
-	float yoff;					//0xE0
-	float zoff;					//0xE4
-	int32_t _0xE8[0x1B];		//0xE8
+	int32_t padding3[CalcFillSize(XOFFOFFSET, ZOFFSET, sizeof(int32_t), sizeof(float))];
+	float xoff;
+	float yoff;
+	float zoff;
+	int32_t padding4[CalcFillSize(TOWARDOFFSET, ZOFFOFFSET, sizeof(int32_t), sizeof(float))];
 	int32_t toward;
-	int _0x158[6];				//0x158
-	int action;					//0x170
-	int _0x174[2];				//0x174
-	int now;					//0x17C: 正在执行帧数
-	char _0x180[0x3A0];			//0x180
-	int RemainingAttacks;		//0x520；剩余攻击次数
-	int _0x51C[2];				//0x524
-	int Invalidate;				//0x52C；是否无效
+	int32_t padding5[CalcFillSize(ACTIONOFFSET, TOWARDOFFSET, sizeof(int32_t), sizeof(int32_t))];
+	int32_t action;
+	int32_t padding6[CalcFillSize(NOWOFFSET, ACTIONOFFSET, sizeof(int32_t), sizeof(int32_t))];
+	int32_t now;
+	int32_t padding7[CalcFillSize(RemainingAttacksOffset, NOWOFFSET, sizeof(int32_t), sizeof(int32_t))];
+	int32_t RemainingAttacks;
+	int32_t padding8[CalcFillSize(InvalidateOffset, RemainingAttacksOffset, sizeof(int32_t), sizeof(int32_t))];
+	int32_t Invalidate;
 
 	inline bool left() {
 		return this->toward == 0;
 	}
 
 	inline CategoryID enemycategory() {
-		return this->enemy->acts->entry[this->enemy->action].iCategoryID;
+		return this->enemy->acts->entry[this->enemy->action].CategoryID;
 	}
 
 	inline SubCategoryID enemysubcategory() {
-		return this->enemy->acts->entry[this->enemy->action].iSubCategoryID;
+		return this->enemy->acts->entry[this->enemy->action].SubCategoryID;
 	}
 
 	inline bool positive() {
@@ -54,7 +57,7 @@ struct projectile
 		return ((this->Invalidate >> 8) & 0x1) != 0;
 	}
 };
-static_assert(offsetof(projectile, Invalidate) == 0x52C, "projectile size error");
+static_assert(offsetof(projectile, Invalidate) == InvalidateOffset, "projectile size error");
 
 struct projectile_list
 {

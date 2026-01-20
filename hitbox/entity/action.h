@@ -243,8 +243,8 @@ static_assert(sizeof(ActionLine) == 0x10, "Size Check");
 
 struct actions_entry							//动作实体类
 {
-	CategoryID iCategoryID;						//0x0；姿势
-	SubCategoryID iSubCategoryID;				//0x4；动作类型
+	CategoryID CategoryID;						//0x0；姿势
+	SubCategoryID SubCategoryID;				//0x4；动作类型
 	int32_t EndFrame;
 	int32_t LoopBackFrame;
 	int32_t OptionFlag;
