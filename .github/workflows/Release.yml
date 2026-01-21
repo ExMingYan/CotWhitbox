@@ -4,9 +4,10 @@ on:
   push:
     tags:
       - "v*"
+      - "prev*"
 
 jobs:
-  buildhitbox:
+  build:
     runs-on: windows-latest
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
@@ -19,8 +20,9 @@ jobs:
       - name: Build Solution
         run: |
           msbuild hitbox.sln /p:Configuration=Release /p:Platform=x64 /verbosity:minimal
+
       - name: Create ZIP archive
-        run: Compress-Archive -Path ./x64/Release/DLLInjector.exe, ./x64/Release/hitbox.dll, ./x64/Release/launcher.exe -DestinationPath hitbox.zip
+        run: Compress-Archive -Path ./x64/Release/*Proxy.dll, ./Proxy/LuaExample/LoadHitbox.lua -DestinationPath Proxy.zip
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -29,6 +31,34 @@ jobs:
           name: ${{ github.ref_name }}
           draft: false
           prerelease: false
-          files: hitbox.zip, ./x64/Release/*Proxy.dll
+          files: Proxy.zip, ./x64/Release/launcher.exe, ./x64/Release/DLLInjector.exe, ./x64/Release/hitbox.dll
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  buildprev:
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/prev')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build Solution
+        run: |
+          msbuild hitbox.sln /p:Configuration=Release /p:Platform=x64 /verbosity:minimal
+
+      - name: Create ZIP archive
+        run: Compress-Archive -Path ./x64/Release/*Proxy.dll, ./Proxy/LuaExample/LoadHitbox.lua -DestinationPath Proxy.zip
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: true
+          files: Proxy.zip, ./x64/Release/launcher.exe, ./x64/Release/DLLInjector.exe, ./x64/Release/hitbox.dll
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

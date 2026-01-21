@@ -70,7 +70,7 @@
 
   dllPath: string **Equivalent to the path of the main process executable file**
 
-  waitWindowLoaded`<sup>`[1](#loaddllwait)`</sup>`?: boolean **Waiting for the main process window to finish loading**
+  [waitWindowLoaded](#loaddllwait): boolean **Waiting for the main process window to finish loading**
   
   windowClassName?: string **if waitWindowLoaded, must provide windowClassName**
 - return
@@ -81,19 +81,19 @@
 
 - args
 
-  vk`<sup>`[2](#keystringcode)`</sup>`: string | integer
+  [vk](#keystringcode): string | integer
 
 #### KeyDown
 
 - args
 
-  vk`<sup>`[2](#keystringcode)`</sup>`: string | integer
+  [vk](#keystringcode): string | integer
 
 #### PressKey
 
 - args (Support table)
 
-  vk `<sup>`[2](#keystringcode) `</sup>`: string | integer
+  [vk](#keystringcode): string | integer
 
   pressTime?: integer **millisecode**
     - default: 16
@@ -105,7 +105,7 @@
 
 - args
 
-  vk`<sup>`[2](#keystringcode)`</sup>`: string | integer
+  [vk](#keystringcode): string | integer
 - return
 
   isPressed: boolean
@@ -116,7 +116,7 @@
 
   sleepTime: integer **millisecond**
 
-#### readX`<sup>`[3](#xrefers)`</sup>`
+#### read[X](#xrefers)
 
 - args
 
@@ -125,7 +125,7 @@
 
   value: integer | number
 
-#### writeX`<sup>`[3](#xrefers)`</sup>`
+#### write[X](#xrefers)
 
 - args
 
@@ -178,7 +178,7 @@
 
 ### context:ContextAccess Function
 
-#### ContextAccess:readX`<sup>`[3](#xrefers)`</sup>`
+#### ContextAccess:read[X](#xrefers)
 
 - args
 
@@ -187,7 +187,7 @@
 
   value: integer | number
 
-#### ContextAccess:writeX`<sup>`[3](#xrefers)`</sup>`
+#### ContextAccess:write[X](#xrefers)
 
 - args
 
