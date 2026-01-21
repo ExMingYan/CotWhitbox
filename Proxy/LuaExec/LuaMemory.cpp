@@ -2,6 +2,10 @@
 #include "LuaMemory.h"
 #include "utils/searcher.h"
 
+static const char* ContextAccess = "ContextAccess";
+static const char* AddressMeta = "AddressMeta";
+static const char* FunctionMeta = "FunctionMeta";
+
 void InitMemoryAccess(lua_State* L)
 {
 	lua_register(L, "AllocMemory", Lua_Alloc);
@@ -34,14 +38,21 @@ void InitMemoryAccess(lua_State* L)
 	lua_register(L, "writeBytes", WriteBytes);
 	lua_register(L, "AOBScanModule", PatternSearch);
 
-	luaL_newmetatable(L, "ContextAccess");
+	luaL_newmetatable(L, ContextAccess);
 	lua_pushcfunction(L, ContextIndex);
 	lua_setfield(L, -2, "__index");
 	lua_pushcfunction(L, ContextNewIndex);
 	lua_setfield(L, -2, "__newindex");
 	lua_pop(L, 1);
 
-	luaL_newmetatable(L, "AddressMeta");
+	luaL_newmetatable(L, FunctionMeta);
+	lua_pushcfunction(L, FunctionCall);
+	lua_setfield(L, -2, "__call");
+	lua_pushcfunction(L, FunctionToString);
+	lua_setfield(L, -2, "__tostring");
+	lua_pop(L, 1);
+
+	luaL_newmetatable(L, AddressMeta);
 	lua_pushcfunction(L, AddressIndex);
 	lua_setfield(L, -2, "__index");
 	lua_pushcfunction(L, AddressNewIndex);
@@ -114,7 +125,7 @@ void InitMemoryAccess(lua_State* L)
 
 	void* udata = lua_newuserdata(L, sizeof(void*));
 	*reinterpret_cast<intptr_t*>(udata) = 0;
-	luaL_getmetatable(L, "ContextAccess");
+	luaL_getmetatable(L, ContextAccess);
 	lua_setmetatable(L, -2);
 	lua_setglobal(L, "context");
 }
@@ -128,7 +139,7 @@ static int Lua_Alloc(lua_State* L)
 		return 1;
 	}
 	const char* attribute = luaL_checkstring(L, 2);
-	std::string attrStr(attribute ? attribute : "RWX");
+	std::string attrStr(attribute ? attribute : MemoryAttributes[4].first);
 	DWORD protect = PAGE_EXECUTE_READWRITE;
 	for (const auto& pair : MemoryAttributes)
 	{
@@ -410,6 +421,11 @@ static int ContextIndex(lua_State* L)
 			lua_pushcfunction(L, ContextInteger);
 			return 1;
 		}
+		if (strcmp(key, "Function") == 0)
+		{
+			lua_pushcfunction(L, ContextFunction);
+			return 1;
+		}
 	}
 
 	if (lua_isnumber(L, 2))
@@ -462,12 +478,36 @@ static int ContextNewIndex(lua_State* L)
 	return 0;
 }
 
+static int ContextFunction(lua_State* L)
+{
+	if (lua_gettop(L) < 2)
+	{
+		lua_pushnil(L);
+		return 1;
+	}
+
+	intptr_t addr = GetAddressFromStack(L, 2);
+	if (isAddressAccessAble(addr))
+	{
+		PushFunctionObject(L, addr);
+		return 1;
+	}
+
+	lua_pushnil(L);
+	return 1;
+}
+
 static int ContextAddress(lua_State* L)
 {
 	int top = lua_gettop(L);
 	if (top >= 2)
 	{
 		intptr_t address = GetAddressFromStack(L, 2);
+		if (!isAddressAccessAble(address))
+		{
+			lua_pushnil(L);
+			return 1;
+		}
 		PushAddressObject(L, address);
 		return 1;
 	}
@@ -479,6 +519,11 @@ static int ContextAddress(lua_State* L)
 			if (udata)
 			{
 				intptr_t address = *reinterpret_cast<intptr_t*>(udata);
+				if (!isAddressAccessAble(address))
+				{
+					lua_pushnil(L);
+					return 1;
+				}
 				PushAddressObject(L, address);
 				return 1;
 			}
@@ -494,6 +539,70 @@ static int ContextInteger(lua_State* L)
 	{
 		intptr_t address = GetAddressFromStack(L, 2);
 		lua_pushinteger(L, address);
+		return 1;
+	}
+	return 0;
+}
+
+static int FunctionCall(lua_State* L)
+{
+	if (!lua_isuserdata(L, 1))
+	{
+		lua_pushnil(L);
+		return 1;
+	}
+
+	intptr_t addr = *reinterpret_cast<intptr_t*>(lua_touserdata(L, 1));
+	if (!isAddressAccessAble(addr))
+	{
+		lua_pushnil(L);
+		return 1;
+	}
+
+	int top = lua_gettop(L);
+	int argCount = top - 1;
+	if (argCount < -1 || argCount > 16)
+	{
+		lua_pushnil(L);
+		return 1;
+	}
+	uint64_t argv[16] = { 0 };
+	for (int i = 0; i < argCount; ++i)
+	{
+		argv[i] = static_cast<uint64_t>(lua_tointeger(L, i + 2));
+	}
+	uint64_t result = 0;
+	switch (argCount)
+	{
+		case 0: result = InvokeN<0>(addr, argv); break;
+		case 1: result = InvokeN<1>(addr, argv); break;
+		case 2: result = InvokeN<2>(addr, argv); break;
+		case 3: result = InvokeN<3>(addr, argv); break;
+		case 4: result = InvokeN<4>(addr, argv); break;
+		case 5: result = InvokeN<5>(addr, argv); break;
+		case 6: result = InvokeN<6>(addr, argv); break;
+		case 7: result = InvokeN<7>(addr, argv); break;
+		case 8: result = InvokeN<8>(addr, argv); break;
+		case 9: result = InvokeN<9>(addr, argv); break;
+		case 10: result = InvokeN<10>(addr, argv); break;
+		case 11: result = InvokeN<11>(addr, argv); break;
+		case 12: result = InvokeN<12>(addr, argv); break;
+		case 13: result = InvokeN<13>(addr, argv); break;
+		case 14: result = InvokeN<14>(addr, argv); break;
+		case 15: result = InvokeN<15>(addr, argv); break;
+		case 16: result = InvokeN<16>(addr, argv); break;
+		default: result = InvokeN<0>(addr, argv); break;
+	}
+	lua_pushinteger(L, static_cast<lua_Integer>(result));
+	return 1;
+}
+
+static int FunctionToString(lua_State* L)
+{
+	if (lua_isuserdata(L, 1))
+	{
+		intptr_t addr = *reinterpret_cast<intptr_t*>(lua_touserdata(L, 1));
+		lua_pushfstring(L, "Function Address: 0x%p", (void*)addr);
 		return 1;
 	}
 	return 0;
@@ -606,8 +715,7 @@ static int AddressToString(lua_State* L)
 	if (lua_isuserdata(L, 1))
 	{
 		intptr_t addr = *reinterpret_cast<intptr_t*>(lua_touserdata(L, 1));
-		void* ptr = (void*)addr;
-		lua_pushfstring(L, "Address: 0x%p", ptr);
+		lua_pushfstring(L, "Address: 0x%p", (void*)addr);
 		return 1;
 	}
 	return 0;
@@ -818,6 +926,14 @@ void PushAddressObject(lua_State* L, intptr_t address)
 {
 	void* udata = lua_newuserdata(L, sizeof(intptr_t));
 	*reinterpret_cast<intptr_t*>(udata) = address;
-	luaL_getmetatable(L, "AddressMeta");
+	luaL_getmetatable(L, AddressMeta);
+	lua_setmetatable(L, -2);
+}
+
+void PushFunctionObject(lua_State* L, intptr_t address)
+{
+	void* udata = lua_newuserdata(L, sizeof(intptr_t));
+	*reinterpret_cast<intptr_t*>(udata) = address;
+	luaL_getmetatable(L, FunctionMeta);
 	lua_setmetatable(L, -2);
 }

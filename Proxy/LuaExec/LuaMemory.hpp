@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <windows.h>
 #include <array>
+#include <utility>
 
 constexpr std::array<std::pair<const char*, DWORD>, 5> MemoryAttributes =
 {{
@@ -35,8 +36,11 @@ static int PatternSearch(lua_State* L);
 
 static int ContextIndex(lua_State* L);
 static int ContextNewIndex(lua_State* L);
+static int ContextFunction(lua_State* L);
 static int ContextAddress(lua_State* L);
 static int ContextInteger(lua_State* L);
+static int FunctionCall(lua_State* L);
+static int FunctionToString(lua_State* L);
 static int AddressIndex(lua_State* L);
 static int AddressNewIndex(lua_State* L);
 static int AddressAdd(lua_State* L);
@@ -56,6 +60,7 @@ static int AddressWriteBytes(lua_State* L);
 
 intptr_t GetAddressFromStack(lua_State* L, int idx);
 void PushAddressObject(lua_State* L, intptr_t address);
+void PushFunctionObject(lua_State* L, intptr_t address);
 
 template<typename T>
 bool ReadMemory(intptr_t address, T &defaultValue)
@@ -155,6 +160,20 @@ int AddressWrite(lua_State* L)
 	}
 	lua_pushboolean(L, false);
 	return 1;
+}
+
+template<std::size_t... I>
+static uint64_t InvokeByIndex(intptr_t addr, const uint64_t* argv, std::index_sequence<I...>)
+{
+	using Fn = uint64_t(*)(decltype(argv[I])...);
+	Fn fn = reinterpret_cast<Fn>(addr);
+	return fn(argv[I]...);
+}
+
+template<std::size_t N>
+static uint64_t InvokeN(intptr_t addr, const uint64_t* argv)
+{
+	return InvokeByIndex(addr, argv, std::make_index_sequence<N>{});
 }
 
 #endif // !LUAMEMORY_HPP
