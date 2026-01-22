@@ -35,7 +35,7 @@ namespace hitboxes {
 					hitboxes::box* box = contexts[index].instance;
 					box->alpha = configurs::alpha;
 					box->thickness = configurs::thickness;
-					box->resolve(p1, entry, pLine, desc, configurs::passineffective);
+					box->resolve(p1, entry, pLine, desc);
 				}
 			}
 
@@ -53,7 +53,7 @@ namespace hitboxes {
 					hitboxes::box* box = contexts[index].instance;
 					box->alpha = configurs::alpha;
 					box->thickness = configurs::thickness;
-					box->resolve(p2, entry, pLine, desc, configurs::passineffective);
+					box->resolve(p2, entry, pLine, desc);
 				}
 			}
 
@@ -76,14 +76,14 @@ namespace hitboxes {
 						hitboxes::box* box = contexts[index].instance;
 						box->alpha = configurs::alpha;
 						box->thickness = configurs::thickness;
-						box->propresolve(props, props_entry, pLine, desc, configurs::passineffective);
+						box->propresolve(props, props_entry, pLine, desc);
 					}
 
 					if (configurs::dp2 && props->owner == p2) {
 						hitboxes::box* box = contexts[index].instance;
 						box->alpha = configurs::alpha;
 						box->thickness = configurs::thickness;
-						box->propresolve(props, props_entry, pLine, desc, configurs::passineffective);
+						box->propresolve(props, props_entry, pLine, desc);
 					}
 				}
 			}

@@ -31,26 +31,26 @@ namespace hitboxes {
 	public:
 		bool foreground(range& r, ImColor color);
 
-		virtual bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) = 0;
-		virtual bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc, bool passineffect) = 0;
+		virtual bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc) = 0;
+		virtual bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc) = 0;
 	};
 
 	class attack :public box {
 	public:
-		bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
-		bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
+		bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc) override;
+		bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc) override;
 	};
 
 	class body : public box {
 	public:
-		bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
-		bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
+		bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc) override;
+		bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc) override;
 	};
 
 	class hit : public box {
 	public:
-		bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
-		bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc, bool passineffect) override;
+		bool resolve(object* obj, actions_entry entry, ActionLine pLine, description desc) override;
+		bool propresolve(projectile* prop, actions_entry entry, ActionLine pLine, description desc) override;
 	};
 
 	class line {

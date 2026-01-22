@@ -4,11 +4,10 @@
 
 #define RemainingAttacksOffset 0x520
 #define InvalidateOffset 0x52C
-
 _declspec(align(8))
 struct projectile
 {
-	int64_t padding0[CalcFillSize(ACTIONSOFFSET, 0, sizeof(int64_t))];
+	int64_t padding0[CalcFillSize(ACTIONSOFFSET, 0, sizeof(int64_t), 0)];
 	actions* acts;
 	int64_t padding1[CalcFillSize(ATTACKSOFFSET, ACTIONSOFFSET, sizeof(int64_t))];
 	attacks* atks;

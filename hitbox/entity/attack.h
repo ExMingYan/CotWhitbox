@@ -6,7 +6,7 @@
 constexpr size_t CalcFillSize(size_t nextOffset, size_t prevOffset, size_t fillsize, size_t prevsize = 8)
 {
 	if (prevOffset == 0)
-		return (nextOffset) / fillsize;
+		return (nextOffset - prevsize) / fillsize;
 	return (nextOffset - prevOffset - prevsize) / fillsize;
 }
 
@@ -157,12 +157,12 @@ struct AttackData
 	int32_t HitNokeDir;
 	int32_t GuardNokeDir;
 	DamageReverseData damageReverse;
-	uint32_t flagpadding : 6;
-	uint32_t IneffectiveStand : 1;
-	uint32_t IneffectiveCrouch : 1;
-	uint32_t IneffectiveAir : 1;
-	uint32_t IneffectiveNotGuard : 1;
-	uint64_t AttackFlag;
+	uint32_t TargetFlag;
+	uint64_t flagpadding : 6;
+	uint64_t IneffectiveStand : 1;
+	uint64_t IneffectiveCrouch : 1;
+	uint64_t IneffectiveAir : 1;
+	uint64_t IneffectiveNotPunish : 1;
 	int32_t ActionBranchKey;
 	int32_t DamageAttr;
 	int32_t VitalRecovery;
@@ -192,5 +192,5 @@ static_assert(sizeof(AttackData) == ActionDataSize, "Size check");
 struct attacks
 {
 	char unknown[0x20];
-	AttackData* atccs;
+	AttackData* attackdatas;
 };

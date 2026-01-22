@@ -33,43 +33,16 @@ namespace hitboxes {
 		return true;
 	}
 
-	bool attack::resolve(object* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) {
+	bool attack::resolve(object* obj, actions_entry entry, ActionLine pLine, description desc) {
 		for (uint32_t i = 0; i < pLine.capacity; i++) {
 			ActionStructure action = pLine.actions[i];
 			if (action.frame != obj->now)
 				continue;
 
 			Attack box = action.attack;
-			AttackData atccs = obj->atks->atccs[box.DataID];
-			if (desc.types.attack != atccs.types)
+			AttackData attackdata = obj->atks->attackdatas[box.DataID];
+			if (desc.types.attack != attackdata.types)
 				continue;
-
-			if (passineffect) {
-
-				if (box.HitOrGuard && (obj->AttackHitorGuard | obj->AttackNotGuard) == 0)
-					continue;
-				else if (box.HitNotGuard && obj->AttackNotGuard == 0)
-					continue;
-
-				if (atccs.hitBackDir == HitBackDirID::IneffectiveBack && !obj->positive())
-					continue;
-				else if (atccs.hitBackDir == HitBackDirID::IneffectiveFront && obj->positive())
-					continue;
-				else if (atccs.hitBackDir == HitBackDirID::IneffectiveAll)
-					continue;
-
-				CategoryID enemyCategory = obj->enemycategory();
-				if (atccs.IneffectiveStand && enemyCategory == CategoryID::Stand)
-					continue;
-				if (atccs.IneffectiveCrouch && enemyCategory == CategoryID::Crouch)
-					continue;
-				if (atccs.IneffectiveAir && enemyCategory == CategoryID::OnAir)
-					continue;
-
-				SubCategoryID enemySubCategory = obj->enemysubcategory();
-				if (atccs.IneffectiveNotGuard && enemySubCategory != SubCategoryID::Defense)
-					continue;
-			}
 
 			range r(obj, box.rect);
 			foreground(r, desc.color);
@@ -77,7 +50,7 @@ namespace hitboxes {
 		return true;
 	}
 
-	bool body::resolve(object* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) {
+	bool body::resolve(object* obj, actions_entry entry, ActionLine pLine, description desc) {
 		for (uint32_t i = 0; i < pLine.capacity; i++) {
 			ActionStructure action = pLine.actions[i];
 			if (action.frame != obj->now)
@@ -89,7 +62,7 @@ namespace hitboxes {
 		return true;
 	}
 
-	bool hit::resolve(object* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) {
+	bool hit::resolve(object* obj, actions_entry entry, ActionLine pLine, description desc) {
 		for (uint32_t i = 0; i < pLine.capacity; i++) {
 			ActionStructure action = pLine.actions[i];
 			Collision box = action.collision;
@@ -116,37 +89,16 @@ namespace hitboxes {
 		return true;
 	}
 
-	bool attack::propresolve(projectile* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) {
+	bool attack::propresolve(projectile* obj, actions_entry entry, ActionLine pLine, description desc) {
 		for (uint32_t i = 0; i < pLine.capacity; i++) {
 			ActionStructure action = pLine.actions[i];
 			if (action.frame != obj->now)
 				continue;
 
 			Attack box = action.attack;
-			AttackData atccs = obj->atks->atccs[box.DataID];
-			if (desc.types.attack != atccs.types)
+			AttackData attackdata = obj->atks->attackdatas[box.DataID];
+			if (desc.types.attack != attackdata.types)
 				continue;
-
-			if (passineffect) {
-				if (atccs.hitBackDir == HitBackDirID::IneffectiveBack && !obj->positive())
-					continue;
-				else if (atccs.hitBackDir == HitBackDirID::IneffectiveFront && obj->positive())
-					continue;
-				else if (atccs.hitBackDir == HitBackDirID::IneffectiveAll)
-					continue;
-
-				CategoryID enemyCategory = obj->enemycategory();
-				if (atccs.IneffectiveStand && enemyCategory == CategoryID::Stand)
-					continue;
-				if (atccs.IneffectiveCrouch && enemyCategory == CategoryID::Crouch)
-					continue;
-				if (atccs.IneffectiveAir && enemyCategory == CategoryID::OnAir)
-					continue;
-
-				SubCategoryID enemySubCategory = obj->enemysubcategory();
-				if (atccs.IneffectiveNotGuard && enemySubCategory != SubCategoryID::Defense)
-					continue;
-			}
 
 			range r(obj, box.rect);
 			foreground(r, desc.color);
@@ -154,7 +106,7 @@ namespace hitboxes {
 		return true;
 	}
 
-	bool body::propresolve(projectile* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) {
+	bool body::propresolve(projectile* obj, actions_entry entry, ActionLine pLine, description desc) {
 		for (uint32_t i = 0; i < pLine.capacity; i++) {
 			ActionStructure action = pLine.actions[i];
 			if (action.frame != obj->now)
@@ -166,7 +118,7 @@ namespace hitboxes {
 		return true;
 	}
 
-	bool hit::propresolve(projectile* obj, actions_entry entry, ActionLine pLine, description desc, bool passineffect) {
+	bool hit::propresolve(projectile* obj, actions_entry entry, ActionLine pLine, description desc) {
 		for (uint32_t i = 0; i < pLine.capacity; i++) {
 			ActionStructure action = pLine.actions[i];
 			Collision box = action.collision;

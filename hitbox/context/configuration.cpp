@@ -6,11 +6,9 @@ namespace configurs {
 	ImFont* icon_brands = nullptr;
 	bool dp1 = false;
 	bool dp2 = false;
-	bool passineffective = false;
 	float alpha = 0.25f;
 	float thickness = 1.0f;
 	int language = -1;
-	std::vector<const char*> passname = { u8"不绘制无效框", u8"Do not draw ineffective boxes", u8"無効なボックスを描画しない" };
 	std::vector<const char*> alphaname = { u8"透明度", u8"Transparency", u8"透明度" };
 	std::vector<const char*> thicknessname = { u8"粗细", u8"Line Thickness", u8"線幅" };
 	std::vector<descript> distancedesc = {

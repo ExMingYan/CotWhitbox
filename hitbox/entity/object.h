@@ -33,7 +33,7 @@ static_assert(offsetof(CBAS, actiontable) == 0xF0, "CBAS size error");
 _declspec(align(8))
 struct object
 {
-	int64_t padding0[CalcFillSize(ACTIONSOFFSET, 0, sizeof(int64_t))];
+	int64_t padding0[CalcFillSize(ACTIONSOFFSET, 0, sizeof(int64_t), 0)];
 	actions* acts;
 	int64_t padding1[CalcFillSize(ATTACKSOFFSET, ACTIONSOFFSET, sizeof(int64_t))];
 	attacks* atks;

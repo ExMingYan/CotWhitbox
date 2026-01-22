@@ -16,11 +16,9 @@ namespace configurs {
 	extern ImFont* icon_brands;
 	extern bool dp1;
 	extern bool dp2;
-	extern bool passineffective;
 	extern float alpha;
 	extern float thickness;
 	extern int language;
-	extern std::vector<const char*> passname;
 	extern std::vector<const char*> alphaname;
 	extern std::vector<const char*> thicknessname;
 	extern std::vector<descript> distancedesc;

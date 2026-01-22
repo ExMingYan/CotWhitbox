@@ -6,7 +6,6 @@ bool dominator::window()
 	hb.ins(u8"settings", [&] {
 		control::trigger("p1", &configurs::dp1);
 		control::trigger("p2", &configurs::dp2);
-		control::trigger(configurs::passname[configurs::language + 1], &configurs::passineffective);
 
 		configurs::GetIniConfig();
 

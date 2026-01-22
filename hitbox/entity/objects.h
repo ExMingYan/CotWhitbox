@@ -10,7 +10,7 @@
 
 struct subobject
 {
-	uint32_t padding0[CalcFillSize(ProjectileListOffset, 0, sizeof(uint32_t))];
+	uint32_t padding0[CalcFillSize(ProjectileListOffset, 0, sizeof(uint32_t), 0)];
 	projectile_list* props_list;
 };
 static_assert(offsetof(subobject, props_list) == ProjectileListOffset, "subobject size error");
@@ -18,7 +18,7 @@ static_assert(offsetof(subobject, props_list) == ProjectileListOffset, "subobjec
 _declspec(align(8))
 struct GameInstance
 {
-	uint64_t padding0[CalcFillSize(Player1Offset, 0, sizeof(uint64_t))];
+	uint64_t padding0[CalcFillSize(Player1Offset, 0, sizeof(uint64_t), 0)];
 	object* p1;
 	object* p2;
 	uint64_t padding1[CalcFillSize(SubObjOffset, Player2Offset, sizeof(uint64_t))];
