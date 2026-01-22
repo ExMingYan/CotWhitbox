@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#define PaddingOffset 0x230
-#define ActionDataSize 0x27E
+#define PaddingOffset 0x238
+#define ActionDataSize 0x286
 
 constexpr size_t CalcFillSize(size_t nextOffset, size_t prevOffset, size_t fillsize, size_t prevsize = 8)
 {
@@ -66,6 +66,8 @@ struct DamageActionSetting
     int32_t Padding0;
     int32_t Padding1;
     int32_t Padding2;
+	int32_t Padding3;
+	int32_t Padding4;
 };
 
 struct DamageReverseData
@@ -131,7 +133,7 @@ struct HitSlowData
 };
 
 #pragma pack(push, 2)
-struct attack_collections
+struct AttackData
 {
 	AttackType types;
 	int32_t SkillType;
@@ -184,11 +186,11 @@ struct attack_collections
 	int32_t LineAttackType;
 	uint8_t Padding[CalcFillSize(ActionDataSize, PaddingOffset, sizeof(uint8_t), 0)];
 };
-static_assert(sizeof(attack_collections) == ActionDataSize, "Size check");
+static_assert(sizeof(AttackData) == ActionDataSize, "Size check");
 #pragma pack(pop)
 
 struct attacks
 {
 	char unknown[0x20];
-	attack_collections* atccs;
+	AttackData* atccs;
 };

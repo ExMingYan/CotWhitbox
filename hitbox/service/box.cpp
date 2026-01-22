@@ -40,7 +40,7 @@ namespace hitboxes {
 				continue;
 
 			Attack box = action.attack;
-			attack_collections atccs = obj->atks->atccs[box.DataID];
+			AttackData atccs = obj->atks->atccs[box.DataID];
 			if (desc.types.attack != atccs.types)
 				continue;
 
@@ -123,7 +123,7 @@ namespace hitboxes {
 				continue;
 
 			Attack box = action.attack;
-			attack_collections atccs = obj->atks->atccs[box.DataID];
+			AttackData atccs = obj->atks->atccs[box.DataID];
 			if (desc.types.attack != atccs.types)
 				continue;
 

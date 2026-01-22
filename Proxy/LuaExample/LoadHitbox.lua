@@ -1,7 +1,7 @@
 -- Fatal Fury COTW hitbox loader -ExMingYan
 
 local function Loadhitbox()
-    if CheckGameVersion("108052") then
+    if CheckGameVersion("113945") then
         LoadDLL("hitbox.dll")
     end
 end

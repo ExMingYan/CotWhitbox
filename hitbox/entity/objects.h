@@ -6,7 +6,7 @@
 #define Player1Offset 0x18
 #define Player2Offset 0x20
 #define ProjectileListOffset 0x38
-#define SubObjOffset 0x75C48
+#define SubObjOffset 0x75CA8
 
 struct subobject
 {
