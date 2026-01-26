@@ -67,7 +67,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>$(TargetDir)builder.exe $(ProjectDir)font\MainFont.ttf $(ProjectDir)font</Command>
@@ -98,7 +98,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>$(TargetDir)builder.exe $(ProjectDir)font\MainFont.ttf $(ProjectDir)font</Command>
@@ -117,19 +117,15 @@
     <ClCompile Include="font\FontAewsome6.cpp" />
     <ClCompile Include="font\FontAwesome6Brands.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
-    <ClCompile Include="imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="mapper\mapper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="minhook\src\buffer.c" />
-    <ClCompile Include="minhook\src\hde\hde32.c" />
-    <ClCompile Include="minhook\src\hde\hde64.c" />
-    <ClCompile Include="minhook\src\hook.c" />
-    <ClCompile Include="minhook\src\trampoline.c" />
     <ClCompile Include="service\box.cpp" />
     <ClCompile Include="service\dispatcher.cpp" />
     <ClCompile Include="service\runable.cpp">
@@ -138,6 +134,7 @@
     <ClCompile Include="symbol\loader.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="utils\graphics.cpp" />
     <ClCompile Include="utils\inirw.cpp" />
     <ClCompile Include="utils\searcher.cpp" />
     <ClCompile Include="view\control.cpp" />
@@ -164,14 +161,12 @@
     <ClInclude Include="entity\props.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="entry\d3dx12.h" />
     <ClInclude Include="entry\entry.h" />
-    <ClInclude Include="entry\entry.hpp" />
     <ClInclude Include="font\FontAewsome6.h" />
     <ClInclude Include="font\MainFont.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
-    <ClInclude Include="imgui\imgui_impl_dx12.h" />
+    <ClInclude Include="imgui\imgui_impl_dx11.h" />
     <ClInclude Include="imgui\imgui_impl_win32.h" />
     <ClInclude Include="imgui\imgui_internal.h" />
     <ClInclude Include="imgui\imstb_rectpack.h" />
@@ -180,14 +175,6 @@
     <ClInclude Include="mapper\mapper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="minhook\include\MinHook.h" />
-    <ClInclude Include="minhook\src\buffer.h" />
-    <ClInclude Include="minhook\src\hde\hde32.h" />
-    <ClInclude Include="minhook\src\hde\hde64.h" />
-    <ClInclude Include="minhook\src\hde\pstdint.h" />
-    <ClInclude Include="minhook\src\hde\table32.h" />
-    <ClInclude Include="minhook\src\hde\table64.h" />
-    <ClInclude Include="minhook\src\trampoline.h" />
     <ClInclude Include="service\box.h" />
     <ClInclude Include="service\dispatcher.h" />
     <ClInclude Include="service\runable.h">
@@ -208,6 +195,7 @@
     <ClInclude Include="unreal_engine\UObject.h" />
     <ClInclude Include="unreal_engine\Vector.h" />
     <ClInclude Include="unreal_engine\World.h" />
+    <ClInclude Include="utils\graphics.h" />
     <ClInclude Include="utils\inirw.h" />
     <ClInclude Include="utils\logger.hpp" />
     <ClInclude Include="utils\release.hpp" />

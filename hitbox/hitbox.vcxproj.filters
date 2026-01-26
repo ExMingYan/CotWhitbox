@@ -31,9 +31,6 @@
     <Filter Include="context">
       <UniqueIdentifier>{6067180e-e210-48f4-a65f-e04d9009cba9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="minhook">
-      <UniqueIdentifier>{b193218f-0e69-4692-aed1-72e83f7f2377}</UniqueIdentifier>
-    </Filter>
     <Filter Include="utils">
       <UniqueIdentifier>{f71f7b7a-46b0-48ea-bbb2-a84d4d9e984d}</UniqueIdentifier>
     </Filter>
@@ -45,21 +42,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="imgui\imgui.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_impl_win32.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_tables.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_widgets.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
     <ClCompile Include="mapper\mapper.cpp">
       <Filter>mapper</Filter>
     </ClCompile>
@@ -71,9 +53,6 @@
     </ClCompile>
     <ClCompile Include="view\control.cpp">
       <Filter>view</Filter>
-    </ClCompile>
-    <ClCompile Include="entry\entry.cpp">
-      <Filter>entry</Filter>
     </ClCompile>
     <ClCompile Include="font\FontAewsome6.cpp">
       <Filter>font</Filter>
@@ -106,9 +85,6 @@
     <ClCompile Include="controller\renderer.cpp">
       <Filter>controller</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\imgui_impl_dx12.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
     <ClCompile Include="utils\searcher.cpp">
       <Filter>utils</Filter>
     </ClCompile>
@@ -118,44 +94,35 @@
     <ClCompile Include="utils\inirw.cpp">
       <Filter>utils</Filter>
     </ClCompile>
-    <ClCompile Include="minhook\src\buffer.c">
-      <Filter>minhook</Filter>
+    <ClCompile Include="entry\entry.cpp">
+      <Filter>entry</Filter>
     </ClCompile>
-    <ClCompile Include="minhook\src\hook.c">
-      <Filter>minhook</Filter>
+    <ClCompile Include="utils\graphics.cpp">
+      <Filter>utils</Filter>
     </ClCompile>
-    <ClCompile Include="minhook\src\trampoline.c">
-      <Filter>minhook</Filter>
+    <ClCompile Include="imgui\imgui.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="minhook\src\hde\hde32.c">
-      <Filter>minhook</Filter>
+    <ClCompile Include="imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="minhook\src\hde\hde64.c">
-      <Filter>minhook</Filter>
+    <ClCompile Include="imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_dx11.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_win32.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="imgui\imconfig.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_win32.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_internal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imstb_rectpack.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imstb_textedit.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imstb_truetype.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
     <ClInclude Include="unreal_engine\AActor.h">
       <Filter>unreal_engine</Filter>
     </ClInclude>
@@ -219,9 +186,6 @@
     <ClInclude Include="view\control.h">
       <Filter>view</Filter>
     </ClInclude>
-    <ClInclude Include="entry\entry.h">
-      <Filter>entry</Filter>
-    </ClInclude>
     <ClInclude Include="font\FontAewsome6.h">
       <Filter>font</Filter>
     </ClInclude>
@@ -246,15 +210,6 @@
     <ClInclude Include="controller\renderer.h">
       <Filter>controller</Filter>
     </ClInclude>
-    <ClInclude Include="entry\d3dx12.h">
-      <Filter>entry</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_dx12.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="entry\entry.hpp">
-      <Filter>entry</Filter>
-    </ClInclude>
     <ClInclude Include="utils\logger.hpp">
       <Filter>utils</Filter>
     </ClInclude>
@@ -273,32 +228,38 @@
     <ClInclude Include="utils\inirw.h">
       <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="minhook\src\buffer.h">
-      <Filter>minhook</Filter>
-    </ClInclude>
-    <ClInclude Include="minhook\src\trampoline.h">
-      <Filter>minhook</Filter>
-    </ClInclude>
-    <ClInclude Include="minhook\src\hde\hde32.h">
-      <Filter>minhook</Filter>
-    </ClInclude>
-    <ClInclude Include="minhook\src\hde\hde64.h">
-      <Filter>minhook</Filter>
-    </ClInclude>
-    <ClInclude Include="minhook\src\hde\pstdint.h">
-      <Filter>minhook</Filter>
-    </ClInclude>
-    <ClInclude Include="minhook\src\hde\table32.h">
-      <Filter>minhook</Filter>
-    </ClInclude>
-    <ClInclude Include="minhook\src\hde\table64.h">
-      <Filter>minhook</Filter>
-    </ClInclude>
-    <ClInclude Include="minhook\include\MinHook.h">
-      <Filter>minhook</Filter>
-    </ClInclude>
     <ClInclude Include="font\MainFont.h">
       <Filter>font</Filter>
+    </ClInclude>
+    <ClInclude Include="entry\entry.h">
+      <Filter>entry</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\graphics.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_dx11.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_win32.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
