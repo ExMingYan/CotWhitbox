@@ -1,4 +1,4 @@
-# Proxy Info
+﻿# Proxy Info
 
 ## Usage
 
@@ -158,6 +158,34 @@
 
   value: ByteTable
 
+#### readBits
+
+- args
+
+  address: integer | context:ContextAccess
+
+  bitsOffset: integer
+
+  bitsCount: integer
+
+- return
+
+  value: integer
+
+#### writeBits
+
+- args
+
+  address: integer | context:ContextAccess
+
+  bitsOffset: integer
+
+  bitsCount: integer
+
+  value: integer
+-  return
+  Success: boolean
+
 ### context Function
 
 #### Context:Address
@@ -213,6 +241,29 @@
   offset?: integer
 
   value: ByteTable
+#### ContextAccess:readBits
+
+- args
+
+  bitsOffset: integer
+
+  bitsCount: integer
+
+- return
+
+  value: integer
+
+#### ContextAccess:writeBits
+
+- args
+
+  bitsOffset: integer
+
+  bitsCount: integer
+
+  value: integer
+-  return
+  Success: boolean
 
 ## Notes
 

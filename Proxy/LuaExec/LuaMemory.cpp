@@ -20,6 +20,7 @@ void InitMemoryAccess(lua_State* L)
 	lua_register(L, "readInt32", ReadIntegerValue<int32_t>);
 	lua_register(L, "readUInt32", ReadIntegerValue<uint32_t>);
 	lua_register(L, "readInt64", ReadIntegerValue<int64_t>);
+	lua_register(L, "readBits", ReadBits);
 	lua_register(L, "readFloat", ReadFloat);
 	lua_register(L, "readDouble", ReadDouble);
 	lua_register(L, "readPointer", ReadPointer);
@@ -32,6 +33,7 @@ void InitMemoryAccess(lua_State* L)
 	lua_register(L, "writeInt32", WriteIntegerValue<int32_t>);
 	lua_register(L, "writeUInt32", WriteIntegerValue<uint32_t>);
 	lua_register(L, "writeInt64", WriteIntegerValue<int64_t>);
+	lua_register(L, "writeBits", WriteBits);
 	lua_register(L, "writeFloat", WriteFloat);
 	lua_register(L, "writeDouble", WriteDouble);
 	lua_register(L, "writePointer", WritePointer);
@@ -88,6 +90,8 @@ void InitMemoryAccess(lua_State* L)
 	lua_setfield(L, -2, "readUInt32");
 	lua_pushcfunction(L, AddressReadIntegerValue<int64_t>);
 	lua_setfield(L, -2, "readInt64");
+	lua_pushcfunction(L, AddressReadBits);
+	lua_setfield(L, -2, "readBits");
 	lua_pushcfunction(L, AddressReadFloat);
 	lua_setfield(L, -2, "readFloat");
 	lua_pushcfunction(L, AddressReadDouble);
@@ -112,6 +116,8 @@ void InitMemoryAccess(lua_State* L)
 	lua_setfield(L, -2, "writeUInt32");
 	lua_pushcfunction(L, AddressWrite<int64_t>);
 	lua_setfield(L, -2, "writeInt64");
+	lua_pushcfunction(L, AddressWriteBits);
+	lua_setfield(L, -2, "writeBits");
 	lua_pushcfunction(L, AddressWriteFloat);
 	lua_setfield(L, -2, "writeFloat");
 	lua_pushcfunction(L, AddressWriteDouble);
@@ -215,6 +221,46 @@ static int Lua_Free(lua_State* L)
 		BOOL result = VirtualFree((LPVOID)addr, 0, MEM_RELEASE);
 		lua_pushboolean(L, result != 0);
 		return 1;
+	}
+	lua_pushboolean(L, false);
+	return 1;
+}
+
+static int ReadBits(lua_State* L)
+{
+	intptr_t addr = GetAddressFromStack(L, 1);
+	int32_t offset = (int32_t)luaL_checkinteger(L, 2);
+	int32_t bits = (int32_t)luaL_checkinteger(L, 3);
+	if (isAddressAccessAble(addr) && offset >= 0 && bits > 0 && (offset + bits) < 64)
+	{
+		int64_t val = 0;
+		if (ReadMemory(addr, val))
+		{
+			val = (val >> offset) & ((1ULL << bits) - 1);
+			lua_pushinteger(L, val);
+			return 1;
+		}
+	}
+	lua_pushnil(L);
+	return 1;
+}
+
+static int WriteBits(lua_State* L)
+{
+	intptr_t addr = GetAddressFromStack(L, 1);
+	int32_t offset = (int32_t)luaL_checkinteger(L, 2);
+	int32_t bits = (int32_t)luaL_checkinteger(L, 3);
+	int64_t value = (int64_t)luaL_checkinteger(L, 4);
+	if (isAddressAccessAble(addr) && offset >= 0 && bits > 0 && (offset + bits) < 64)
+	{
+		int64_t val = 0;
+		if (ReadMemory(addr, val))
+		{
+			int64_t mask = ((1ULL << bits) - 1) << offset;
+			val = (val & ~mask) | ((value << offset) & mask);
+			lua_pushboolean(L, WriteMemory(addr, val));
+			return 1;
+		}
 	}
 	lua_pushboolean(L, false);
 	return 1;
@@ -719,6 +765,60 @@ static int AddressToString(lua_State* L)
 		return 1;
 	}
 	return 0;
+}
+
+static int AddressReadBits(lua_State* L)
+{
+	if (lua_isuserdata(L, 1) && lua_isnumber(L, 2) && lua_isnumber(L, 3))
+	{
+		intptr_t addr = *reinterpret_cast<intptr_t*>(lua_touserdata(L, 1));
+		if (lua_isnumber(L, 2))
+		{
+			addr += (ptrdiff_t)lua_tointeger(L, 2);
+		}
+		int32_t offset = (int32_t)lua_tointeger(L, 2);
+		int32_t bits = (int32_t)lua_tointeger(L, 3);
+		if (isAddressAccessAble(addr) && offset >= 0 && bits > 0 && (offset + bits) < 64)
+		{
+			int64_t val = 0;
+			if (ReadMemory(addr, val))
+			{
+				val = (val >> offset) & ((1ULL << bits) - 1);
+				lua_pushinteger(L, val);
+				return 1;
+			}
+		}
+	}
+	lua_pushnil(L);
+	return 1;
+}
+
+static int AddressWriteBits(lua_State* L)
+{
+	if (lua_isuserdata(L, 1) && lua_isnumber(L, 2) && lua_isnumber(L, 3) && lua_isnumber(L, 4))
+	{
+		intptr_t addr = *reinterpret_cast<intptr_t*>(lua_touserdata(L, 1));
+		if (lua_isnumber(L, 2))
+		{
+			addr += (ptrdiff_t)lua_tointeger(L, 2);
+		}
+		int32_t offset = (int32_t)lua_tointeger(L, 2);
+		int32_t bits = (int32_t)lua_tointeger(L, 3);
+		int64_t value = (int64_t)lua_tointeger(L, 4);
+		if (isAddressAccessAble(addr) && offset >= 0 && bits > 0 && (offset + bits) < 64)
+		{
+			int64_t val = 0;
+			if (ReadMemory(addr, val))
+			{
+				int64_t mask = ((1ULL << bits) - 1) << offset;
+				val = (val & ~mask) | ((value << offset) & mask);
+				lua_pushboolean(L, WriteMemory(addr, val));
+				return 1;
+			}
+		}
+	}
+	lua_pushboolean(L, false);
+	return 1;
 }
 
 static int AddressReadFloat(lua_State* L)
