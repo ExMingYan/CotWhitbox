@@ -24,11 +24,13 @@ struct RegistersInfo
 
 const char* GetProcessFolderPath();
 DWORD GetProcessID();
-const std::wstring GetProcessName();
+const std::string GetProcessName();
 HANDLE GetProcessHandle();
 bool WindowLoaded(std::string WindowClass);
 bool CheckGameVersion(const std::wstring versionSymbol);
-bool GetModuleBaseAddressAndSize(const std::wstring& moduleName, uintptr_t& baseAddress, size_t& moduleSize);
+bool ModuleExists(const std::string& moduleName);
+bool GetModuleBaseAddressAndSize(const std::string& moduleName, uintptr_t& baseAddress, size_t& moduleSize);
+bool GetModuleSectionAddressAndSize(const std::string& moduleName, const std::string& sectionName, uintptr_t& sectionAddress, size_t& sectionSize);
 bool isAddressAccessAble(intptr_t address);
 DWORD GetAddressProtect(intptr_t address);
 bool isAddressExecutable(intptr_t address);

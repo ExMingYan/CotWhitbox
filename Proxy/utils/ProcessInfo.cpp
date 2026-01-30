@@ -25,17 +25,17 @@ const char* GetProcessFolderPath()
 	return path;
 }
 
-const std::wstring GetProcessName()
+const std::string GetProcessName()
 {
-	static std::wstring processName;
+	static std::string processName;
 	if (processName.empty())
 	{
-		wchar_t fullPath[MAX_PATH] = { 0 };
-		GetModuleFileNameW(NULL, fullPath, MAX_PATH);
-		wchar_t* lastBackslash = wcsrchr(fullPath, L'\\');
+		char fullPath[MAX_PATH] = { 0 };
+		GetModuleFileNameA(NULL, fullPath, MAX_PATH);
+		char* lastBackslash = strrchr(fullPath, '\\');
 		if (lastBackslash)
 		{
-			processName = lastBackslash + 1;
+			processName = std::string(lastBackslash + 1);
 		}
 		else
 		{
@@ -82,9 +82,15 @@ bool CheckGameVersion(const std::wstring versionSymbol)
 	return SearchWStringInMemory(hProcess, moduleAddress, moduleSize, versionSymbol);
 }
 
-bool GetModuleBaseAddressAndSize(const std::wstring& moduleName, uintptr_t& baseAddress, size_t& moduleSize)
+bool ModuleExists(const std::string& moduleName)
 {
-	HMODULE hModule = GetModuleHandleW(moduleName.c_str());
+	HMODULE hModule = GetModuleHandleA(moduleName.c_str());
+	return hModule != NULL;
+}
+
+bool GetModuleBaseAddressAndSize(const std::string& moduleName, uintptr_t& baseAddress, size_t& moduleSize)
+{
+	HMODULE hModule = GetModuleHandleA(moduleName.c_str());
 	if (hModule == NULL)
 		return false;
 
@@ -95,6 +101,29 @@ bool GetModuleBaseAddressAndSize(const std::wstring& moduleName, uintptr_t& base
 	baseAddress = reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll);
 	moduleSize = moduleInfo.SizeOfImage;
 	return true;
+}
+
+bool GetModuleSectionAddressAndSize(const std::string& moduleName, const std::string& sectionName, uintptr_t& sectionAddress, size_t& sectionSize)
+{
+	HMODULE hModule = GetModuleHandleA(moduleName.c_str());
+	if (hModule == NULL)
+		return false;
+	unsigned char* baseAddress = reinterpret_cast<unsigned char*>(hModule);
+	PIMAGE_DOS_HEADER dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(baseAddress);
+	PIMAGE_NT_HEADERS ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(baseAddress + dosHeader->e_lfanew);
+	PIMAGE_SECTION_HEADER sectionHeader = IMAGE_FIRST_SECTION(ntHeaders);
+	for (WORD i = 0; i < ntHeaders->FileHeader.NumberOfSections; ++i)
+	{
+		std::string currentSectionName(reinterpret_cast<char*>(sectionHeader->Name), strnlen_s(reinterpret_cast<char*>(sectionHeader->Name), IMAGE_SIZEOF_SHORT_NAME));
+		if (currentSectionName == sectionName)
+		{
+			sectionAddress = reinterpret_cast<uintptr_t>(baseAddress + sectionHeader->VirtualAddress);
+			sectionSize = static_cast<size_t>(sectionHeader->Misc.VirtualSize);
+			return true;
+		}
+		++sectionHeader;
+	}
+	return false;
 }
 
 bool isAddressAccessAble(intptr_t address)

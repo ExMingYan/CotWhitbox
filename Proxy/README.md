@@ -64,6 +64,23 @@
 
   IsTargetVersion: boolean
 
+#### CheckModule
+
+- arg
+  moduleName: string
+- return
+  moduleExists: boolean
+  
+#### GetModuleAddress
+
+- args
+  moduleName: string
+  
+  sectionName?: string
+  
+- return
+  address: ContextAccess
+
 #### LoadDLL
 
 - args
