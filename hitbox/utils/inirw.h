@@ -16,6 +16,7 @@ namespace fs = std::filesystem;
 
 using Rgb = std::array<std::uint8_t, 3>;
 
+void SetIniPath();
 std::vector<Rgb> ini_read_colors(std::vector<description>& descriptions, const std::string& section = "Colors");
 std::vector<Rgb> ini_read_colors(std::vector<descript>& descript, const std::string& section = "Configs");
 bool ini_write_colors(const std::vector<Rgb>& colors, std::vector<description>& descriptions, const std::string& section = "Colors");

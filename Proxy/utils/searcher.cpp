@@ -1,4 +1,5 @@
 ﻿#include "searcher.h"
+#include <cctype>
 
 void searcher::ParsePattern(const std::string& pattern, std::vector<uint8_t>& bytes, std::vector<PatternType>& mask)
 {

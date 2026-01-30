@@ -13,7 +13,19 @@ const char* GetModuleFolderPath(const std::string& moduleName)
 	if (path[0] == 0)
 	{
 		char fullPath[MAX_PATH] = { 0 };
-		GetModuleFileNameA(NULL, fullPath, MAX_PATH);
+		if (moduleName.empty())
+		{
+			GetModuleFileNameA(NULL, fullPath, MAX_PATH);
+		}
+		else
+		{
+			HMODULE hModule = GetModuleHandleA(moduleName.c_str());
+			if (hModule == NULL)
+			{
+				return nullptr;
+			}
+			GetModuleFileNameA(hModule, fullPath, MAX_PATH);
+		}
 		char* lastBackslash = strrchr(fullPath, '\\');
 		if (lastBackslash)
 		{

@@ -133,6 +133,9 @@
     <ClCompile Include="minhook\src\hde\hde64.c">
       <Filter>minhook</Filter>
     </ClCompile>
+    <ClCompile Include="utils\ProcessInfo.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -299,6 +302,9 @@
     </ClInclude>
     <ClInclude Include="font\MainFont.h">
       <Filter>font</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\ProcessInfo.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

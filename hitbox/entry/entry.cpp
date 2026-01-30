@@ -226,6 +226,7 @@ bool entry(HMODULE hmodule)
 	Process::Module = hmodule;
 	Process::ID = GetCurrentProcessId();
 	Process::Handle = GetCurrentProcess();
+	SetIniPath();
 	bool InitHook = false;
 	while (InitHook == false) {
 		if (DirectX12::Init() == true) {

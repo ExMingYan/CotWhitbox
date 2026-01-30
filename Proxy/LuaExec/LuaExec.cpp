@@ -24,7 +24,7 @@ void ExecuteLuaFile()
 
 fs::path GetLuaScriptFolder()
 {
-	fs::path processPath = fs::path(GetProcessFolderPath());
+	fs::path processPath = fs::path(GetModuleFolderPath());
 	fs::path ScriptFolder = processPath / "LuaProxy";
 	return ScriptFolder;
 }
