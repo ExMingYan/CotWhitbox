@@ -23,7 +23,7 @@ int main()
 		bool success = GetModuleBaseAddressAndSize(GetProcessIdByName(processName), processName, moduleAddress, moduleSize);
 		if (!success || moduleAddress == 0 || moduleSize == 0)
 			throw std::exception("module invalid");
-		bool versionCheck = SearchWStringInMemory(hProcess, moduleAddress, moduleSize, L"113945");
+		bool versionCheck = SearchWStringInMemory(hProcess, moduleAddress, moduleSize, L"117535");
 		if (!versionCheck)
 			throw std::exception("version invalid");
 		utils::loader load;

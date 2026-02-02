@@ -171,6 +171,7 @@ bool entry(HMODULE hmodule)
 		return false;
 	}
 
+	SetIniPath();
 	graphic->attach(initialize, &present, options::present);
 	graphic->attach(change, &resize, options::resize);
 	return true;

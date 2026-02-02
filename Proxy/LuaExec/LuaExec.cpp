@@ -24,7 +24,7 @@ void ExecuteLuaFile()
 
 fs::path GetLuaScriptFolder()
 {
-	fs::path processPath = fs::path(GetProcessFolderPath());
+	fs::path processPath = fs::path(GetModuleFolderPath());
 	fs::path ScriptFolder = processPath / "LuaProxy";
 	return ScriptFolder;
 }
@@ -35,6 +35,7 @@ LuaExec::LuaExec()
 	luaL_openlibs(L);
 	lua_register(L, "CheckGameVersion", Lua_CheckGameVersion);
 	lua_register(L, "LoadDLL", Lua_LoadLibrary);
+	lua_register(L, "LoadDLLWithEntry", Lua_LoadLibraryEntry);
 	lua_register(L, "Sleep", Lua_Sleep);
 	InitMemoryAccess(L);
 	InitKeyFunctions(L);
@@ -101,6 +102,31 @@ static int Lua_LoadLibrary(lua_State* L)
 	{
 		lua_pushboolean(L, false);
 	}
+	return 1;
+}
+
+static int Lua_LoadLibraryEntry(lua_State* L)
+{
+	const char* dllPath = luaL_checkstring(L, 1);
+	const char* entryName = luaL_checkstring(L, 2);
+	loggers::information(__FUNCTION__, __LINE__, "Loading DLL: %s, Entry: %s", dllPath, entryName);
+	HMODULE hModule = LoadLibraryA(dllPath);
+	if (hModule)
+	{
+		FARPROC entryProc = GetProcAddress(hModule, entryName);
+		if (entryProc)
+		{
+			loggers::information(__FUNCTION__, __LINE__, "Calling DLL Entry: %s", entryName);
+			typedef void (*EntryFunc)();
+			EntryFunc func = reinterpret_cast<EntryFunc>(entryProc);
+			func();
+			lua_pushboolean(L, true);
+			return 1;
+		}
+		loggers::information(__FUNCTION__, __LINE__, "Failed to get DLL Entry: %s", entryName);
+	}
+	loggers::information(__FUNCTION__, __LINE__, "Failed to load DLL: %s", dllPath);
+	lua_pushboolean(L, false);
 	return 1;
 }
 

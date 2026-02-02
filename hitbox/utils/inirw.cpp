@@ -1,7 +1,19 @@
 ﻿#include "inirw.h"
 #include "logger.hpp"
+#include "ProcessInfo.h"
 
-static fs::path inipath = fs::current_path() / "hitbox.ini";
+static fs::path inipath;
+
+void SetIniPath()
+{
+	auto moduleFolder = GetModuleFolderPath("hitbox.dll");
+    if (moduleFolder && strlen(moduleFolder) > 0) {
+        inipath = fs::path(moduleFolder) / "hitbox.ini";
+    }
+    else {
+        inipath = fs::current_path() / "hitbox.ini";
+	}
+}
 
 static bool parse_rgb(const std::string& s, Rgb& out) {
     std::istringstream iss(s);

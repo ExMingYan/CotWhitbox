@@ -224,4 +224,6 @@ public:
 	}
 };
 
+bool SearchWStringInMemory(HANDLE hProcess, uintptr_t startAddress, size_t regionSize, const std::wstring& targetString);
+
 #endif // SEARCHER_H

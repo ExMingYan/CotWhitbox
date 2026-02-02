@@ -136,6 +136,7 @@
     </ClCompile>
     <ClCompile Include="utils\graphics.cpp" />
     <ClCompile Include="utils\inirw.cpp" />
+    <ClCompile Include="utils\ProcessInfo.cpp" />
     <ClCompile Include="utils\searcher.cpp" />
     <ClCompile Include="view\control.cpp" />
     <ClCompile Include="view\decoration.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="utils\graphics.h" />
     <ClInclude Include="utils\inirw.h" />
     <ClInclude Include="utils\logger.hpp" />
+    <ClInclude Include="utils\ProcessInfo.h" />
     <ClInclude Include="utils\release.hpp" />
     <ClInclude Include="utils\searcher.h" />
     <ClInclude Include="utils\singleton.hpp" />

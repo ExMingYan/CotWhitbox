@@ -20,6 +20,8 @@ constexpr std::array<std::pair<const char*, DWORD>, 5> MemoryAttributes =
 	{"RWX", PAGE_EXECUTE_READWRITE}
 }};
 
+static int Lua_ModuleExists(lua_State* L);
+static int Lua_GetModuleAddress(lua_State* L);
 static int Lua_Alloc(lua_State* L);
 static int Lua_GetProtect(lua_State* L);
 static int Lua_SetProtect(lua_State* L);

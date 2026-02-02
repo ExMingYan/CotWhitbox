@@ -8,6 +8,9 @@ static const char* FunctionMeta = "FunctionMeta";
 
 void InitMemoryAccess(lua_State* L)
 {
+	lua_register(L, "CheckModule", Lua_ModuleExists);
+	lua_register(L, "GetModuleAddress", Lua_GetModuleAddress);
+	lua_register(L, "AOBScanModule", PatternSearch);
 	lua_register(L, "AllocMemory", Lua_Alloc);
 	lua_register(L, "GetMemoryProtect", Lua_GetProtect);
 	lua_register(L, "SetMemoryProtect", Lua_SetProtect);
@@ -38,7 +41,6 @@ void InitMemoryAccess(lua_State* L)
 	lua_register(L, "writeDouble", WriteDouble);
 	lua_register(L, "writePointer", WritePointer);
 	lua_register(L, "writeBytes", WriteBytes);
-	lua_register(L, "AOBScanModule", PatternSearch);
 
 	luaL_newmetatable(L, ContextAccess);
 	lua_pushcfunction(L, ContextIndex);
@@ -134,6 +136,53 @@ void InitMemoryAccess(lua_State* L)
 	luaL_getmetatable(L, ContextAccess);
 	lua_setmetatable(L, -2);
 	lua_setglobal(L, "context");
+}
+
+static int Lua_ModuleExists(lua_State* L)
+{
+	const char* moduleName = luaL_checkstring(L, 1);
+	if (!moduleName)
+	{
+		lua_pushnil(L);
+		return 1;
+	}
+	bool exists = ModuleExists(std::string(moduleName));
+	lua_pushboolean(L, exists);
+	return 1;
+}
+
+static int Lua_GetModuleAddress(lua_State* L)
+{
+	const char* moduleName = luaL_checkstring(L, 1);
+	if (!moduleName)
+	{
+		lua_pushnil(L);
+		return 1;
+	}
+	const char* sectionName = luaL_optlstring(L, 2, nullptr, nullptr);
+	if (sectionName)
+	{
+		uintptr_t sectionAddress;
+		size_t sectionSize;
+		bool success = GetModuleSectionAddressAndSize(std::string(moduleName), std::string(sectionName), sectionAddress, sectionSize);
+		if (success)
+		{
+			PushAddressObject(L, (intptr_t)sectionAddress);
+			return 1;
+		}
+		lua_pushnil(L);
+		return 1;
+	}
+	uintptr_t baseAddress;
+	size_t moduleSize;
+	bool success = GetModuleBaseAddressAndSize(std::string(moduleName), baseAddress, moduleSize);
+	if (success)
+	{
+		PushAddressObject(L, (intptr_t)baseAddress);
+		return 1;
+	}
+	lua_pushnil(L);
+	return 1;
 }
 
 static int Lua_Alloc(lua_State* L)

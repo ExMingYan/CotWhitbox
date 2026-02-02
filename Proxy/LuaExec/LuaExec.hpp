@@ -16,6 +16,7 @@ DWORD WINAPI LuaAlwaysWithThread(const fs::path LuaPath);
 void ExecuteLua(fs::path LuaFileFolder);
 static int Lua_CheckGameVersion(lua_State* L);
 static int Lua_LoadLibrary(lua_State* L);
+static int Lua_LoadLibraryEntry(lua_State* L);
 static int Lua_Sleep(lua_State* L);
 static void WaitForMainWindow(std::string windowClass);
 
