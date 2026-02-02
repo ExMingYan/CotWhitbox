@@ -1,8 +1,8 @@
 #include <windows.h>
 VS_VERSION_INFO VERSIONINFO
 
-FILEVERSION 1,7,2,5
-PRODUCTVERSION 1,7,2,113945
+FILEVERSION 1,7,3,12
+PRODUCTVERSION 1,7,3,117535
 FILEFLAGSMASK 0x3fL
 FILEFLAGS 0x0L
 FILEOS 0x40004L
@@ -15,12 +15,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "ExMingYan"
             VALUE "FileDescription", "CotW v1.7.2 dx12 hitbox display"
-            VALUE "FileVersion", "1.7.2.5"
+            VALUE "FileVersion", "1.7.3.12"
             VALUE "InternalName", "CotWhitbox"
             VALUE "LegalCopyright", "Copyright (c) 2025 by ExMingYan"
             VALUE "OriginalFilename", "CotWhitbox"
             VALUE "ProductName", "CotWhitbox"
-            VALUE "ProductVersion", "1.7.2.113945"
+            VALUE "ProductVersion", "1.7.3.117535"
         END
     END
     BLOCK "VarFileInfo"

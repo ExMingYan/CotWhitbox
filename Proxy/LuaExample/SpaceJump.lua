@@ -30,11 +30,6 @@ local TrialESCMenu = function() -- 考验任务/Trial
     ESCPatch(ESCAddress, 9)
 end
 
-local VersusESCMenu = function() -- 对战/Versus
-    local ESCAddress = MainProgramSearch("84 C0 75 ? 41 80 ? 0F 75 ? 4?")
-    ESCPatch(ESCAddress, 7)
-end
-
 local SetSpace = function() -- 按键设置可用Space键/Button Config can use Space Key
     local SpaceAddress = MainProgramSearch("48 B9 FE 38 C0 FF CF 1E")
     SpaceAddress[7] = 0x1A
@@ -52,9 +47,6 @@ return {
     },
     {
         main = TrialESCMenu
-    },
-    {
-        main = VersusESCMenu
     },
     {
         main = SetSpace
