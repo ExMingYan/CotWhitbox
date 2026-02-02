@@ -48,7 +48,7 @@ set_target_properties(hitbox PROPERTIES CXX_EXTENSIONS OFF)
 
 target_compile_features(hitbox PRIVATE cxx_std_17)
 target_link_libraries(hitbox PRIVATE
-    d3d12
+    d3d11
     dxgi
     dbghelp
 )
