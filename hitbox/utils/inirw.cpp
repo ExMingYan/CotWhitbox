@@ -6,8 +6,13 @@ static fs::path inipath;
 
 void SetIniPath()
 {
-    fs::path processPath = fs::path(GetModuleFolderPath("hitbox.dll"));
-    inipath = processPath / "hitbox.ini";
+    auto moduleFolder = GetModuleFolderPath("hitbox.dll");
+    if (moduleFolder && strlen(moduleFolder) > 0) {
+        inipath = fs::path(moduleFolder) / "hitbox.ini";
+    }
+    else {
+        inipath = fs::current_path() / "hitbox.ini";
+    }
 }
 
 static bool parse_rgb(const std::string& s, Rgb& out) {
