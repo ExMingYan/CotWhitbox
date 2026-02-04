@@ -88,6 +88,36 @@ bool ModuleExists(const std::string& moduleName)
 	return hModule != NULL;
 }
 
+bool GetAddressModuleName(intptr_t address, std::string& moduleName)
+{
+	HMODULE hModules[1024];
+	DWORD cbNeeded;
+	HANDLE hProcess = GetCurrentProcess();
+	if (EnumProcessModules(hProcess, hModules, sizeof(hModules), &cbNeeded))
+	{
+		size_t moduleCount = cbNeeded / sizeof(HMODULE);
+		for (size_t i = 0; i < moduleCount; ++i)
+		{
+			MODULEINFO moduleInfo;
+			if (GetModuleInformation(hProcess, hModules[i], &moduleInfo, sizeof(moduleInfo)))
+			{
+				uintptr_t baseAddress = reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll);
+				size_t moduleSize = moduleInfo.SizeOfImage;
+				if (address >= baseAddress && address < (baseAddress + moduleSize))
+				{
+					char modName[MAX_PATH];
+					if (GetModuleFileNameA(hModules[i], modName, sizeof(modName) / sizeof(char)))
+					{
+						moduleName = std::string(modName);
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
 bool GetModuleBaseAddressAndSize(const std::string& moduleName, uintptr_t& baseAddress, size_t& moduleSize)
 {
 	HMODULE hModule = GetModuleHandleA(moduleName.c_str());

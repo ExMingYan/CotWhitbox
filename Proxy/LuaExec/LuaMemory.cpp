@@ -9,6 +9,7 @@ static const char* FunctionMeta = "FunctionMeta";
 void InitMemoryAccess(lua_State* L)
 {
 	lua_register(L, "CheckModule", Lua_ModuleExists);
+	lua_register(L, "GetAddressModule", Lua_GetAddressModule);
 	lua_register(L, "GetModuleAddress", Lua_GetModuleAddress);
 	lua_register(L, "AOBScanModule", PatternSearch);
 	lua_register(L, "AllocMemory", Lua_Alloc);
@@ -148,6 +149,20 @@ static int Lua_ModuleExists(lua_State* L)
 	}
 	bool exists = ModuleExists(std::string(moduleName));
 	lua_pushboolean(L, exists);
+	return 1;
+}
+
+static int Lua_GetAddressModule(lua_State* L)
+{
+	intptr_t addr = GetAddressFromStack(L, 1);
+	std::string moduleName;
+	bool success = GetAddressModuleName(addr, moduleName);
+	if (success)
+	{
+		lua_pushstring(L, moduleName.c_str());
+		return 1;
+	}
+	lua_pushnil(L);
 	return 1;
 }
 

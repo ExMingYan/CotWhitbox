@@ -16,9 +16,6 @@
 #include "font/FontAwesome6Brands.h"
 #include "font/IconsFontAwesome6Brands.inl"
 
-HRESULT(*present)(IDXGISwapChain3* This, UINT SyncInterval, UINT Flags) = nullptr;
-HRESULT(*resize)(IDXGISwapChain3* This, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) = nullptr;
-
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 HRESULT hkPresent(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags);
 

@@ -29,6 +29,7 @@ HANDLE GetProcessHandle();
 bool WindowLoaded(std::string WindowClass);
 bool CheckGameVersion(const std::wstring versionSymbol);
 bool ModuleExists(const std::string& moduleName);
+bool GetAddressModuleName(intptr_t address, std::string& moduleName);
 bool GetModuleBaseAddressAndSize(const std::string& moduleName, uintptr_t& baseAddress, size_t& moduleSize);
 bool GetModuleSectionAddressAndSize(const std::string& moduleName, const std::string& sectionName, uintptr_t& sectionAddress, size_t& sectionSize);
 bool isAddressAccessAble(intptr_t address);
